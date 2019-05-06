@@ -6,11 +6,13 @@
 </div>
 <div>
   <div class="polaroid" *ngFor="let pet of pets">
-    <img src={{pet.img}} alt="Smiley face" width="450" height="330">
+    <img class="hover-on-link" (click)="openPetInfo(pet.id)" 
+      src={{pet.img}} alt="Smiley face" width="450" height="330">
     <div class="container">
       <i class="awesome-icon fa fa-flag fa-2x" aria-hidden="true"></i>
       <i class="awesome-icon fa fa-eye-slash fa-2x" aria-hidden="true"></i>
-      <h1> {{pet.name}} </h1>
+      <h1 class="hover-on-link"
+          (click)="openPetInfo(pet.id)"> {{pet.name}} </h1>
     </div>
   </div>
 </div>

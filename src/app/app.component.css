@@ -16,3 +16,8 @@ div.container {
 .awesome-icon {
   padding: 0px 7px 0px 7px;
 }
+
+.hover-on-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -13,6 +13,10 @@ export class AppComponent implements OnInit {
 
   pets = [];
 
+  openPetInfo(id) {
+    window.open("https://www.animalhumanesociety.org/" + id, "_blank");
+  }
+
   ngOnInit() {
     // make call to animalhumanesociety
     this.http.get('https://www.animalhumanesociety.org/adoption', { responseType: 'text' }).subscribe(data => {

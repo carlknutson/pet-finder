@@ -21,3 +21,22 @@ div.container {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.petfinder-title {
+  font-size: 50px;
+}
+
+.search-criteria-title {
+  font-size: 30px;
+  margin-right: 40px;
+}
+
+.mat-form-field {
+  display: inline;
+  font-size: 20px;
+}
+
+.mat-form-field-wrapper {
+  width: 400px;
+  margin-right: 100px;
+}

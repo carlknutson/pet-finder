@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DOMParser } from 'dom-parser';
+
+export interface PetType {
+  value: string;
+  viewValue: string;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,11 +17,16 @@ export class AppComponent implements OnInit {
 
   constructor(private http: HttpClient){ }
 
+  events = [];
   pets = [];
+  petTypes: PetType[] = [
+    {value: 'dog', viewValue: 'Dog'},
+    {value: 'cat', viewValue: 'Cat'}
+  ];
 
   openPetInfo(id) {
     window.open("https://www.animalhumanesociety.org/" + id, "_blank");
-  }
+  };
 
   ngOnInit() {
     // make call to animalhumanesociety
@@ -66,7 +77,9 @@ export class AppComponent implements OnInit {
     });
 
 
+
+
     // remove any 'dismissed' pets from list that will be shown
-  }
+  };
 
 }

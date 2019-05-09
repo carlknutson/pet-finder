@@ -1,20 +1,77 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Petfinder
-  </h1>
-</div>
-<div>
-  <div class="polaroid" *ngFor="let pet of pets">
-    <img class="hover-on-link" (click)="openPetInfo(pet.id)" 
-      src={{pet.img}} alt="Smiley face" width="450" height="330">
-    <div class="container">
-      <i class="awesome-icon fa fa-flag fa-2x" aria-hidden="true"></i>
-      <i class="awesome-icon fa fa-eye-slash fa-2x" aria-hidden="true"></i>
-      <h1 class="hover-on-link"
-          (click)="openPetInfo(pet.id)"> {{pet.name}} </h1>
+<mat-sidenav-container class="example-container">
+  <mat-sidenav #sidenav mode="side" [(opened)]="opened" (opened)="events.push('open!')"
+               (closed)="events.push('close!')">
+    <h2 class="search-criteria-title">
+      Search Criteria
+    </h2>
+    <mat-form-field>
+      <mat-label>All Types</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let type of petTypes" [value]="type.value">
+          {{type.viewValue}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>All Sexes</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let type of sexes" [value]="type.value">
+          {{type.viewValue}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>All Age Groups</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let type of ages" [value]="type.value">
+          {{type.viewValue}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>All Breeds</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let type of breeds" [value]="type.value">
+          {{type.viewValue}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>All Locations</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let type of locations" [value]="type.value">
+          {{type.viewValue}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button type="button" name="Clear Filters"></button>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <p><button mat-button (click)="sidenav.toggle()">sidenav.toggle()</button></p>
+    <div style="text-align:center">
+      <h1 class="petfinder-title">
+        Petfinder
+      </h1>
     </div>
-  </div>
-</div>
+
+    <div>
+      <div class="polaroid" *ngFor="let pet of pets">
+        <img class="hover-on-link" (click)="openPetInfo(pet.id)"
+          src={{pet.img}} alt="Smiley face" width="450" height="330">
+        <div class="container">
+          <i class="awesome-icon fa fa-flag fa-2x" aria-hidden="true"></i>
+          <i class="awesome-icon fa fa-eye-slash fa-2x" aria-hidden="true"></i>
+          <h1 class="hover-on-link"
+              (click)="openPetInfo(pet.id)"> {{pet.name}} </h1>
+        </div>
+      </div>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>
 
 <router-outlet></router-outlet>

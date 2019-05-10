@@ -1,19 +1,19 @@
 <mat-sidenav-container class="example-container">
-  <mat-sidenav #sidenav mode="side" [(opened)]="opened" (opened)="events.push('open!')"
-               (closed)="events.push('close!')">
+  <mat-sidenav #sidenav mode="side" [(opened)]="opened" (opened)="events.push('opened')"
+               (closed)="events.push('closed')">
     <h2 class="search-criteria-title">
       Search Criteria
     </h2>
     <mat-form-field>
-      <mat-label>All Types</mat-label>
-      <mat-select>
-        <mat-option *ngFor="let type of petTypes" [value]="type.value">
+      <mat-label>Type</mat-label>
+      <mat-select (selectionChange)="petFilterChange()" [(ngModel)]="selectedType">
+        <mat-option *ngFor="let type of filterListTypes" [value]="type.value">
           {{type.viewValue}}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field>
+    <!-- <mat-form-field>
       <mat-label>All Sexes</mat-label>
       <mat-select>
         <mat-option *ngFor="let type of sexes" [value]="type.value">
@@ -47,11 +47,11 @@
           {{type.viewValue}}
         </mat-option>
       </mat-select>
-    </mat-form-field>
-    <button type="button" name="Clear Filters"></button>
+    </mat-form-field> -->
   </mat-sidenav>
   <mat-sidenav-content>
-    <p><button mat-button (click)="sidenav.toggle()">sidenav.toggle()</button></p>
+    <i *ngIf="'opened' == findNavBarStatus()" (click)="sidenav.toggle()" class="font-awesome-nav fa fa-arrow-left fa-7x" aria-hidden="true"></i>
+    <i *ngIf="'closed' == findNavBarStatus()" (click)="sidenav.toggle()" class="font-awesome-nav fa fa-arrow-right fa-7x" aria-hidden="true"></i>
     <div style="text-align:center">
       <h1 class="petfinder-title">
         Petfinder

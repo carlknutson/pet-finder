@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DOMParser } from 'dom-parser';
 
@@ -15,7 +15,7 @@ export interface PetType {
 export class AppComponent implements OnInit {
   title = 'petfinder';
 
-  constructor(private http: HttpClient){ }
+  constructor(private http: HttpClient, private changeDetectorRef: ChangeDetectorRef){ }
 
   events = ['closed'];
 
@@ -50,61 +50,17 @@ export class AppComponent implements OnInit {
   };
 
   ngOnInit() {
+    var self = this;
     chrome.storage.local.get(['filter_type'], function(result) {
-      if (result['filter_type'] == null) {
+      var cachedType = result['filter_type'];
+      if (cachedType == null) {
         console.log('filter_type is empty');
       } else {
-        console.log('filter_type has a value of: ' + result['filter_type']);
+        console.log('filter_type has a value of: ' + cachedType);
+        self.selectedType = cachedType;
       }
+      self.petFilterChange();
     });
-    
-    // make call to animalhumanesociety
-    this.http.get('https://www.animalhumanesociety.org/adoption', { responseType: 'text' }).subscribe(data => {
-      console.log(data);
-      var DomParser = require('dom-parser');
-      var parser = new DomParser();
-      var httpDoc = parser.parseFromString(data,"text/html");
-      console.log(httpDoc);
-
-      var petDataList = [];
-      var petList = httpDoc.getElementsByClassName('field--name-name');
-      var imageList = httpDoc.getElementsByClassName('field--name-field-main-image');
-
-      // for each, parse out: animalID, cloudfront url, name,
-      //LATER implement following: breed, sex/year, location
-      var i;
-      for (i = 0; i < petList.length; i++) {
-        var petObj = petList[i].getElementsByTagName('a');
-        var imageObj = imageList[i].getElementsByTagName('img');
-        var pet = {};
-        console.log(imageObj);
-        pet['name'] = petObj[0]['innerHTML'];
-        pet['id'] = petObj[0].attributes[0].value;
-        pet['img'] = imageObj[0].attributes[0].value;
-        petDataList.push(pet);
-      }
-      console.log(petDataList);
-
-      this.pets = petDataList;
-
-      chrome.storage.local.set({key: 'testing the value'}, function() {
-        console.log('Value is set to ' + 'testing the value');
-      });
-
-      chrome.storage.local.get(['0','key', '121'], function(result) {
-        if (result['0'] == null) {
-          console.log('key:0 results are empty');
-        } else {
-          console.log('key:0 results are not empty');
-        }
-        if (result['key'] == null) {
-          console.log('key:key results are empty');
-        } else {
-          console.log('key:key results are not empty');
-        }
-      });
-    });
-    // remove any 'dismissed' pets from list that will be shown
   };
 
   // new request
@@ -113,21 +69,25 @@ export class AppComponent implements OnInit {
     obj['filter_type'] = this.selectedType;
 
     chrome.storage.local.set(obj, function() {
-      console.log("Caching filter_type and " + this.selectedType);
+      console.log(obj);
     });
 
     var link = 'https://www.animalhumanesociety.org/adoption';
     if (this.selectedType) {
       link = link + '?f%5B0%5D=' + this.selectedType;
+    } else {
+      console.log("not true: " + this.selectedType);
     }
+
     this.http.get(link, { responseType: 'text' }).subscribe(data => {
-      console.log(data);
+      // console.log(data);
+      this.pets = [];
+      console.log("link: " + link);
       var DomParser = require('dom-parser');
       var parser = new DomParser();
       var httpDoc = parser.parseFromString(data,"text/html");
-      console.log(httpDoc);
+      // console.log(httpDoc);
 
-      var petDataList = [];
       var petList = httpDoc.getElementsByClassName('field--name-name');
       var imageList = httpDoc.getElementsByClassName('field--name-field-main-image');
 
@@ -138,23 +98,41 @@ export class AppComponent implements OnInit {
         var petObj = petList[i].getElementsByTagName('a');
         var imageObj = imageList[i].getElementsByTagName('img');
         var pet = {};
-        console.log(imageObj);
+        // console.log(imageObj);
         pet['name'] = petObj[0]['innerHTML'];
         pet['id'] = petObj[0].attributes[0].value;
-        pet['img'] = imageObj[0].attributes[0].value;
-        petDataList.push(pet);
+        pet['img'] = "https://www.animalhumanesociety.org" + imageObj[0].attributes[0].value;
+        this.pets.push(pet);
       }
-      console.log(petDataList);
 
-      this.pets = petDataList;
+      // create petid list and get all cached values
+      // loop through list adding non-D pets into the main viewing list
+      // ensure model is updated
 
-      console.log(this.events);
+      // needed to notify of model changes
+      this.changeDetectorRef.detectChanges();
     });
-  }
+  };
+
+  hidePet(index, id) {
+    var obj = {};
+    obj[id] = "D";
+
+    chrome.storage.local.set(obj, function() {
+      console.log(obj);
+    });
+
+    this.pets.splice(index, 1);
+
+    // needed to notify of model changes
+    this.changeDetectorRef.detectChanges();
+  };
 
   findNavBarStatus() {
     if (this.events.length > 0) {
       return this.events[this.events.length - 1];
     }
-  }
+  };
+
+
 }

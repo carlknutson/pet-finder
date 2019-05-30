@@ -17,8 +17,6 @@ export class AppComponent implements OnInit {
 
   constructor(private http: HttpClient, private changeDetectorRef: ChangeDetectorRef){ }
 
-  events = ['closed'];
-
   pets = [];
 
   selectedType: string;
@@ -81,7 +79,7 @@ export class AppComponent implements OnInit {
 
     this.http.get(link, { responseType: 'text' }).subscribe(data => {
       // console.log(data);
-      this.pets = [];
+      var dirtyPets = [];
       console.log("link: " + link);
       var DomParser = require('dom-parser');
       var parser = new DomParser();
@@ -102,15 +100,34 @@ export class AppComponent implements OnInit {
         pet['name'] = petObj[0]['innerHTML'];
         pet['id'] = petObj[0].attributes[0].value;
         pet['img'] = "https://www.animalhumanesociety.org" + imageObj[0].attributes[0].value;
-        this.pets.push(pet);
+        dirtyPets.push(pet);
       }
 
       // create petid list and get all cached values
+      var petIdList = [];
+      var j;
+      for (j = 0; j < dirtyPets.length; j++) {
+        petIdList.push(dirtyPets[j].id);
+      }
+
+      var self = this;
+      chrome.storage.local.get(petIdList, function(result) {
+        console.log(result);
+        // for (var property1 in result) {
+        //   string1 += result[property1];
+        // }
+        self.pets = [];
+        for (var i = 0; i < dirtyPets.length; i++) {
+            if (result[dirtyPets[i].id] != "D") {
+                self.pets.push(dirtyPets[i]);
+            }
+        }
+        self.changeDetectorRef.detectChanges();
+      });
+
       // loop through list adding non-D pets into the main viewing list
       // ensure model is updated
-
       // needed to notify of model changes
-      this.changeDetectorRef.detectChanges();
     });
   };
 
@@ -127,12 +144,5 @@ export class AppComponent implements OnInit {
     // needed to notify of model changes
     this.changeDetectorRef.detectChanges();
   };
-
-  findNavBarStatus() {
-    if (this.events.length > 0) {
-      return this.events[this.events.length - 1];
-    }
-  };
-
 
 }

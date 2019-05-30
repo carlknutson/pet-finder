@@ -15,6 +15,11 @@ div.container {
 
 .awesome-icon {
   padding: 0px 7px 0px 7px;
+  cursor: pointer;
+}
+
+#title-icon {
+  padding-right: 15;
 }
 
 .hover-on-link:hover {
@@ -22,9 +27,14 @@ div.container {
   cursor: pointer;
 }
 
+.hover-on-icon:hover {
+  color: red;
+}
+
 .petfinder-title {
   font-size: 50px;
   display: inline;
+
 }
 
 .search-criteria-title {
@@ -49,8 +59,9 @@ mat-sidenav {
 }
 
 .font-awesome-nav {
-  font-size: 50px;
+  font-size: 45px;
   float: left;
+  padding-left: 10px;
 }
 
 mat-select {

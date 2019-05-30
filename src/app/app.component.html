@@ -2,7 +2,7 @@
   <mat-sidenav #sidenav mode="side" [(opened)]="opened" (opened)="events.push('opened')"
                (closed)="events.push('closed')">
     <h2 class="search-criteria-title">
-      Search Criteria {{selectedType}}
+      Search Criteria
     </h2>
     <mat-form-field>
       <mat-label>Type</mat-label>
@@ -50,11 +50,10 @@
     </mat-form-field> -->
   </mat-sidenav>
   <mat-sidenav-content>
-    <i *ngIf="'opened' == findNavBarStatus()" (click)="sidenav.toggle()" class="font-awesome-nav fa fa-arrow-left fa-7x" aria-hidden="true"></i>
-    <i *ngIf="'closed' == findNavBarStatus()" (click)="sidenav.toggle()" class="font-awesome-nav fa fa-arrow-right fa-7x" aria-hidden="true"></i>
+    <i (click)="sidenav.toggle()" class="font-awesome-nav fa fa-bars fa-2x" aria-hidden="true"></i>
     <div style="text-align:center">
       <h1 class="petfinder-title">
-        Petfinder
+        <i class="title-icon awesome-icon fa fa-binoculars" aria-hidden="true"></i> PetWatch
       </h1>
     </div>
 
@@ -63,8 +62,8 @@
         <img class="hover-on-link" (click)="openPetInfo(pet.id)"
           src={{pet.img}} alt="Smiley face" width="450" height="330">
         <div class="container">
-          <i class="awesome-icon fa fa-flag fa-2x" aria-hidden="true"></i>
-          <i class="awesome-icon fa fa-eye-slash fa-2x" (click)="hidePet(i, pet.id)" aria-hidden="true"></i>
+          <i class="hover-on-icon awesome-icon fa fa-heart fa-2x" aria-hidden="true"></i>
+          <i class="hover-on-icon awesome-icon fa fa-times fa-2x" (click)="hidePet(i, pet.id)" aria-hidden="true"></i>
           <h1 class="hover-on-link"
               (click)="openPetInfo(pet.id)"> {{pet.name}} </h1>
         </div>

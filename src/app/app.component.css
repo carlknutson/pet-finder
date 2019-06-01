@@ -31,6 +31,10 @@ div.container {
   color: red;
 }
 
+.watched-pet {
+  color: red;
+}
+
 .petfinder-title {
   font-size: 50px;
   display: inline;

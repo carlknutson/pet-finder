@@ -2,11 +2,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DOMParser } from 'dom-parser';
 
-export interface PetType {
-  value: string;
-  viewValue: string;
-}
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -28,20 +23,6 @@ export class AppComponent implements OnInit {
     {value: 'animal_type%3ACat', viewValue: 'Cat'},
     {value: 'animal_type%3ASmall%26Furry', viewValue: 'Other Small Animals'},
   ];
-
-  // TODO: filter by breed, location on results
-  // filterListSexes = [
-  //   {value: 'all', viewValue: 'All Sexes'},
-  //   {value: 'female', viewValue: 'Female'},
-  //   {value: 'male', viewValue: 'Male'}
-  // ];
-  // filterListAges = [
-  //   {value: 'lt6', viewValue: 'All Sexes'},
-  //   {value: 'female', viewValue: 'Female'},
-  //   {value: 'male', viewValue: 'Male'}
-  // ];
-// filterListBreeds = []
-// filterListLocations = [];
 
   openPetInfo(id) {
     window.open("https://www.animalhumanesociety.org/" + id, "_blank");
@@ -99,7 +80,8 @@ export class AppComponent implements OnInit {
         // console.log(imageObj);
         pet['name'] = petObj[0]['innerHTML'];
         pet['id'] = petObj[0].attributes[0].value;
-        pet['img'] = "https://www.animalhumanesociety.org" + imageObj[0].attributes[0].value;
+        pet['img'] = imageObj[0].attributes[0].value;
+        pet['status'] = '';
         dirtyPets.push(pet);
       }
 
@@ -113,15 +95,26 @@ export class AppComponent implements OnInit {
       var self = this;
       chrome.storage.local.get(petIdList, function(result) {
         console.log(result);
-        // for (var property1 in result) {
-        //   string1 += result[property1];
-        // }
+
+        var unwatchedPets = [];
+
+        // use for watched pets
         self.pets = [];
+
         for (var i = 0; i < dirtyPets.length; i++) {
-            if (result[dirtyPets[i].id] != "D") {
+            switch(result[dirtyPets[i].id]) {
+              case "D":
+                break;
+              case "W":
+                dirtyPets[i].status = "W";
                 self.pets.push(dirtyPets[i]);
+                break;
+              default:
+                unwatchedPets.push(dirtyPets[i]);
             }
         }
+        self.pets = self.pets.concat(unwatchedPets);
+
         self.changeDetectorRef.detectChanges();
       });
 
@@ -144,5 +137,26 @@ export class AppComponent implements OnInit {
     // needed to notify of model changes
     this.changeDetectorRef.detectChanges();
   };
+
+  watchPetToggle(index, id, status) {
+    var cachedObj = {};
+    var newStatus = "";
+
+    if (status == "") {
+      newStatus = "W";
+    }
+
+    cachedObj[id] = newStatus;
+
+    chrome.storage.local.set(cachedObj, function() {
+      console.log(cachedObj);
+    });
+
+    // update data model value for css
+    this.pets[index].status = newStatus;
+
+    // needed to notify of model changes
+    this.changeDetectorRef.detectChanges();
+  }
 
 }

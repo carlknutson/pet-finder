@@ -62,7 +62,9 @@
         <img class="hover-on-link" (click)="openPetInfo(pet.id)"
           src={{pet.img}} alt="Smiley face" width="450" height="330">
         <div class="container">
-          <i class="hover-on-icon awesome-icon fa fa-heart fa-2x" aria-hidden="true"></i>
+          <i [ngClass]="{'watched-pet': pet.status == 'W'}"
+              class="hover-on-icon awesome-icon fa fa-heart fa-2x" aria-hidden="true"
+              (click)="watchPetToggle(i, pet.id, pet.status)"></i>
           <i class="hover-on-icon awesome-icon fa fa-times fa-2x" (click)="hidePet(i, pet.id)" aria-hidden="true"></i>
           <h1 class="hover-on-link"
               (click)="openPetInfo(pet.id)"> {{pet.name}} </h1>

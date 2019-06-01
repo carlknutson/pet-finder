@@ -1,10 +1,15 @@
 {
   "manifest_version": 2,
-  "name": "Pup Finder",
-  "description": "Get notified of new dogs and cats from the local animal shelter.",
-  "version": "1",
+  "name": "PetWatch",
+  "description": "Convenient tool to keep updated on new potential pets from local animal shelters.",
+  "version": "1.0",
+  "icons": { "16": "assets/icon_16.png",
+             "48": "assets/icon_48.png",
+             "128": "assets/icon_128.png" },
+
   "author": "Carl Knutson",
   "browser_action": {
+    "default_icon": "assets/icon_16.png",
     "default_popup": "index.html"
   },
   "permissions": ["activeTab", "https://www.animalhumanesociety.org/*", "storage"],

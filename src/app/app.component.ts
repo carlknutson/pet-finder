@@ -8,7 +8,7 @@ import { DOMParser } from 'dom-parser';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'petfinder';
+  title = 'PetWatch';
 
   constructor(private http: HttpClient, private changeDetectorRef: ChangeDetectorRef){ }
 

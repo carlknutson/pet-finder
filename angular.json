@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "petfinder": {
+    "petwatch": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/petfinder",
+            "outputPath": "dist/petwatch",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -58,18 +58,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "petfinder:build"
+            "browserTarget": "petwatch:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "petfinder:build:production"
+              "browserTarget": "petwatch:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "petfinder:build"
+            "browserTarget": "petwatch:build"
           }
         },
         "test": {
@@ -103,7 +103,7 @@
         }
       }
     },
-    "petfinder-e2e": {
+    "petwatch-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -112,11 +112,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "petfinder:serve"
+            "devServerTarget": "petwatch:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "petfinder:serve:production"
+              "devServerTarget": "petwatch:serve:production"
             }
           }
         },
@@ -132,5 +132,5 @@
       }
     }
   },
-  "defaultProject": "petfinder"
+  "defaultProject": "petwatch"
 }

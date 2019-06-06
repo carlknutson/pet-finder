@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "PetWatch",
-  "description": "Convenient tool to keep updated on new potential pets from local animal shelters.",
-  "version": "1.0",
+  "description": "Stay up to date and track potential pets from local animal shelters.",
+  "version": "1.1",
   "icons": { "16": "assets/icon_16.png",
              "48": "assets/icon_48.png",
              "128": "assets/icon_128.png" },

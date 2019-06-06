@@ -50,17 +50,17 @@
     </mat-form-field> -->
   </mat-sidenav>
   <mat-sidenav-content>
-    <i (click)="sidenav.toggle()" class="font-awesome-nav fa fa-bars fa-2x" aria-hidden="true"></i>
+    <i (click)="sidenav.toggle()" class="font-awesome-nav fa fa-bars" aria-hidden="true"></i>
     <div style="text-align:center">
       <h1 class="petfinder-title">
-        <i class="title-icon awesome-icon fa fa-binoculars" aria-hidden="true"></i> PetWatch
+        <i id="title-icon" class="awesome-icon fa fa-binoculars" aria-hidden="true"></i> PetWatch
       </h1>
     </div>
 
     <div *ngIf="pets.length > 0">
       <div class="polaroid" *ngFor="let pet of pets; let i = index">
         <img class="hover-on-link" (click)="openPetInfo(pet.id)"
-          src={{pet.img}} alt="Smiley face" width="450" height="330">
+          src={{pet.img}} width="273" height="200">
         <div class="container">
           <i [ngClass]="{'watched-pet': pet.status == 'W'}"
               class="hover-on-icon awesome-icon fa fa-heart fa-2x" aria-hidden="true"

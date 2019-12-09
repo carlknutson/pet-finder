@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { DOMParser } from 'dom-parser';
+import { ShelterService } from './shelter.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,7 @@ import { DOMParser } from 'dom-parser';
 export class AppComponent implements OnInit {
   title = 'PetWatch';
 
-  constructor(private http: HttpClient, private changeDetectorRef: ChangeDetectorRef){ }
+  constructor(private changeDetectorRef: ChangeDetectorRef, private shelterService: ShelterService){ }
 
   pets = [];
 
@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.shelterService.test();
     var self = this;
     chrome.storage.local.get(['filter_type'], function(result) {
       var cachedType = result['filter_type'];
@@ -57,71 +58,7 @@ export class AppComponent implements OnInit {
     } else {
       console.log("not true: " + this.selectedType);
     }
-
-    this.http.get(link, { responseType: 'text' }).subscribe(data => {
-      // console.log(data);
-      var dirtyPets = [];
-      console.log("link: " + link);
-      var DomParser = require('dom-parser');
-      var parser = new DomParser();
-      var httpDoc = parser.parseFromString(data,"text/html");
-      // console.log(httpDoc);
-
-      var petList = httpDoc.getElementsByClassName('field--name-name');
-      var imageList = httpDoc.getElementsByClassName('field--name-field-main-image');
-
-      // for each, parse out: animalID, cloudfront url, name,
-      //LATER implement following: breed, sex/year, location
-      var i;
-      for (i = 0; i < petList.length; i++) {
-        var petObj = petList[i].getElementsByTagName('a');
-        var imageObj = imageList[i].getElementsByTagName('img');
-        var pet = {};
-        // console.log(imageObj);
-        pet['name'] = petObj[0]['innerHTML'];
-        pet['id'] = petObj[0].attributes[0].value;
-        pet['img'] = imageObj[0].attributes[0].value;
-        pet['status'] = '';
-        dirtyPets.push(pet);
-      }
-
-      // create petid list and get all cached values
-      var petIdList = [];
-      var j;
-      for (j = 0; j < dirtyPets.length; j++) {
-        petIdList.push(dirtyPets[j].id);
-      }
-
-      var self = this;
-      chrome.storage.local.get(petIdList, function(result) {
-        console.log(result);
-
-        var unwatchedPets = [];
-
-        // use for watched pets
-        self.pets = [];
-
-        for (var i = 0; i < dirtyPets.length; i++) {
-            switch(result[dirtyPets[i].id]) {
-              case "D":
-                break;
-              case "W":
-                dirtyPets[i].status = "W";
-                self.pets.push(dirtyPets[i]);
-                break;
-              default:
-                unwatchedPets.push(dirtyPets[i]);
-            }
-        }
-        self.pets = self.pets.concat(unwatchedPets);
-
-        self.changeDetectorRef.detectChanges();
-      });
-
-      // loop through list adding non-D pets into the main viewing list
-      // ensure model is updated
-      // needed to notify of model changes
-    });
+    this.pets = this.shelterService.parseShelter(link);
   };
 
   hidePet(index, id) {

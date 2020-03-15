@@ -29,17 +29,16 @@ export class AppComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.shelterService.test();
-    var self = this;
-    chrome.storage.local.get(['filter_type'], function(result) {
+
+    chrome.storage.local.get(['filter_type'], result => {
       var cachedType = result['filter_type'];
       if (cachedType == null) {
         console.log('filter_type is empty');
       } else {
         console.log('filter_type has a value of: ' + cachedType);
-        self.selectedType = cachedType;
+        this.selectedType = cachedType;
       }
-      self.petFilterChange();
+      this.petFilterChange();
     });
   };
 
@@ -58,7 +57,14 @@ export class AppComponent implements OnInit {
     } else {
       console.log("not true: " + this.selectedType);
     }
-    this.pets = this.shelterService.parseShelter(link);
+    
+    this.shelterService.parseShelter(link).then(value => {
+      console.log(value);
+      this.pets = [];
+      this.pets = this.pets.concat(value);
+      this.changeDetectorRef.detectChanges();
+    })
+    
   };
 
   hidePet(index, id) {
@@ -94,6 +100,10 @@ export class AppComponent implements OnInit {
 
     // needed to notify of model changes
     this.changeDetectorRef.detectChanges();
+  }
+
+  printCount() {
+    console.log("Count of the pets: " + this.pets.length);
   }
 
 }

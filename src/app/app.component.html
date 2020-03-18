@@ -5,7 +5,7 @@
     </h2>
     <mat-form-field>
       <mat-label>Type</mat-label>
-      <mat-select (selectionChange)="petFilterChange()" [(ngModel)]="selectedType">
+      <mat-select (selectionChange)="updatePetList()" [(ngModel)]="selectedPetType">
         <mat-option *ngFor="let type of filterListTypes" [value]="type.value">
           {{type.viewValue}}
         </mat-option>
@@ -58,7 +58,7 @@
 
     <div *ngIf="pets.length > 0">
       <div class="polaroid" *ngFor="let pet of pets; let i = index">
-        <img class="hover-on-link" (click)="openPetInfo(pet.id)"
+        <img class="hover-on-link" (click)="openShelterSite(pet.id)"
           src={{pet.img}} width="273" height="200">
         <div class="container">
           <i [ngClass]="{'watched-pet': pet.status == 'W'}"
@@ -66,7 +66,7 @@
               (click)="watchPetToggle(i, pet.id, pet.status)"></i>
           <i class="hover-on-icon awesome-icon fa fa-times fa-2x" (click)="hidePet(i, pet.id)" aria-hidden="true"></i>
           <h1 class="hover-on-link"
-              (click)="openPetInfo(pet.id)"> {{pet.name}} </h1>
+              (click)="openShelterSite(pet.site)"> {{pet.name}} </h1>
         </div>
       </div>
     </div>

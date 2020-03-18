@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { DOMParser } from 'dom-parser';
-import { ShelterService } from './shelter.service';
+import { ShelterService } from './services/shelter.service';
 
 @Component({
   selector: 'app-root',
@@ -14,51 +13,44 @@ export class AppComponent implements OnInit {
 
   pets = [];
 
-  selectedType: string;
+  selectedPetType: string;
 
-  // filter lists
   filterListTypes = [
-    {value: '', viewValue: 'All Types'},
-    {value: 'animal_type%3ADog', viewValue: 'Dog'},
-    {value: 'animal_type%3ACat', viewValue: 'Cat'},
-    {value: 'animal_type%3ASmall%26Furry', viewValue: 'Other Small Animals'},
+    {value: '*', viewValue: 'All Types'},
+    {value: 'dog', viewValue: 'Dog'},
+    {value: 'cat', viewValue: 'Cat'},
+    {value: 'other', viewValue: 'Other Small Animals'},
   ];
 
-  openPetInfo(id) {
-    window.open("https://www.animalhumanesociety.org/" + id, "_blank");
+  openShelterSite(site:string) {
+    window.open(site);
   };
 
   ngOnInit() {
 
-    chrome.storage.local.get(['filter_type'], result => {
-      var cachedType = result['filter_type'];
-      if (cachedType == null) {
-        console.log('filter_type is empty');
-      } else {
-        console.log('filter_type has a value of: ' + cachedType);
-        this.selectedType = cachedType;
-      }
-      this.petFilterChange();
-    });
+    // chrome.storage.local.get(['filter_type'], result => {
+    //   var cachedType = result['filter_type'];
+    //   if (cachedType == null) {
+    //     console.log('filter_type is empty');
+    //   } else {
+    //     console.log('filter_type has a value of: ' + cachedType);
+    //     this.selectedPetType = cachedType;
+    //   }
+      this.updatePetList();
+    // });
   };
 
-  // new request
-  petFilterChange() {
-    var obj = {};
-    obj['filter_type'] = this.selectedType;
 
-    chrome.storage.local.set(obj, function() {
-      console.log(obj);
-    });
+  updatePetList() {
 
-    var link = 'https://www.animalhumanesociety.org/adoption';
-    if (this.selectedType) {
-      link = link + '?f%5B0%5D=' + this.selectedType;
-    } else {
-      console.log("not true: " + this.selectedType);
-    }
-    
-    this.shelterService.parseShelter(link).then(value => {
+    // var obj = {};
+    // obj['filter_type'] = this.selectedPetType;
+
+    // chrome.storage.local.set(obj, function() {
+    //   console.log(obj);
+    // });
+
+    this.shelterService.getPets(this.selectedPetType).then(value => {
       console.log(value);
       this.pets = [];
       this.pets = this.pets.concat(value);
@@ -68,12 +60,12 @@ export class AppComponent implements OnInit {
   };
 
   hidePet(index, id) {
-    var obj = {};
-    obj[id] = "D";
+    // var obj = {};
+    // obj[id] = "D";
 
-    chrome.storage.local.set(obj, function() {
-      console.log(obj);
-    });
+    // chrome.storage.local.set(obj, function() {
+    //   console.log(obj);
+    // });
 
     this.pets.splice(index, 1);
 
@@ -95,13 +87,12 @@ export class AppComponent implements OnInit {
       console.log(cachedObj);
     });
 
-    // update data model value for css
     this.pets[index].status = newStatus;
-
-    // needed to notify of model changes
     this.changeDetectorRef.detectChanges();
+    
   }
 
+  // TODO: remove
   printCount() {
     console.log("Count of the pets: " + this.pets.length);
   }

@@ -1,19 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-
 @Injectable({
   providedIn: 'root'
 })
-export class ShelterService {
+export class AnimalHumaneSocietyService {
 
   constructor(private http: HttpClient) { }
-  test() {
-    console.log("hello");
-  }
 
-  parseShelter(link) {
+  // TODO: pass logic to specific shelter
+  // resolveShelterUrl(type) {
     
+  // }
+
+  getPets(type) {
+
+    var link = 'https://www.animalhumanesociety.org/adoption';
+    if (type) {
+      link = link + '?f%5B0%5D=' + type;
+    } else {
+      console.log("not true: " + type);
+    }
+
     return new Promise((resolve, reject) => {
       this.http.get(link, { responseType: 'text' }).subscribe(data => {
         // console.log(data);
@@ -39,6 +47,7 @@ export class ShelterService {
           pet['id'] = petObj[0].attributes[0].value;
           pet['img'] = imageObj[0].attributes[0].value;
           pet['status'] = '';
+          pet['site'] = "https://www.animalhumanesociety.org/" + petObj[0].attributes[0].value + "_blank";
           dirtyPets.push(pet);
         }
 
@@ -49,29 +58,31 @@ export class ShelterService {
           petIdList.push(dirtyPets[j].id);
         }
 
-        chrome.storage.local.get(petIdList, result => {
-          var pets:any[] = [];
+        // chrome.storage.local.get(petIdList, result => {
+        //   var pets:any[] = [];
 
-          console.log(result);
+        //   console.log(result);
 
-          var unwatchedPets = [];
+        //   var unwatchedPets = [];
 
-          for (var i = 0; i < dirtyPets.length; i++) {
-              switch(result[dirtyPets[i].id]) {
-                case "D":
-                  break;
-                case "W":
-                  dirtyPets[i].status = "W";
-                  pets.push(dirtyPets[i]);
-                  break;
-                default:
-                  unwatchedPets.push(dirtyPets[i]);
-              }
-          }
-          pets = pets.concat(unwatchedPets);
-          console.log("Pet Counter: " + pets.length)
-          resolve(pets);
-        });
+        //   for (var i = 0; i < dirtyPets.length; i++) {
+        //       switch(result[dirtyPets[i].id]) {
+        //         case "D":
+        //           break;
+        //         case "W":
+        //           dirtyPets[i].status = "W";
+        //           pets.push(dirtyPets[i]);
+        //           break;
+        //         default:
+        //           unwatchedPets.push(dirtyPets[i]);
+        //       }
+        //   }
+        //   pets = pets.concat(unwatchedPets);
+        //   console.log("Pet Counter: " + pets.length)
+          // resolve(pets);
+        // });
+
+        resolve(dirtyPets);
       });
     });
   }

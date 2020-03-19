@@ -8,29 +8,26 @@ export class AnimalHumaneSocietyService {
 
   constructor(private http: HttpClient) { }
 
-  // TODO: pass logic to specific shelter
-  // resolveShelterUrl(type) {
-    
-  // }
+  url: string = 'https://www.animalhumanesociety.org';
+
+  petTypeMapping = {  all: '',
+                      dog: 'animal_type%3ADog', 
+                      cat: 'animal_type%3ACat', 
+                      other: 'animal_type%3ASmall%26Furry'  }
 
   getPets(type) {
 
-    var link = 'https://www.animalhumanesociety.org/adoption';
-    if (type) {
-      link = link + '?f%5B0%5D=' + type;
-    } else {
-      console.log("not true: " + type);
-    }
+    var link = this.resolveShelterUrl(type);
 
     return new Promise((resolve, reject) => {
       this.http.get(link, { responseType: 'text' }).subscribe(data => {
-        // console.log(data);
+
         var dirtyPets = [];
-        console.log("link: " + link);
+        var petIdList = [];
+
         var DomParser = require('dom-parser');
         var parser = new DomParser();
         var httpDoc = parser.parseFromString(data,"text/html");
-        // console.log(httpDoc);
 
         var petList = httpDoc.getElementsByClassName('field--name-name');
         var imageList = httpDoc.getElementsByClassName('field--name-field-main-image');
@@ -42,20 +39,14 @@ export class AnimalHumaneSocietyService {
           var petObj = petList[i].getElementsByTagName('a');
           var imageObj = imageList[i].getElementsByTagName('img');
           var pet = {};
-          // console.log(imageObj);
+
           pet['name'] = petObj[0]['innerHTML'];
           pet['id'] = petObj[0].attributes[0].value;
           pet['img'] = imageObj[0].attributes[0].value;
           pet['status'] = '';
-          pet['site'] = "https://www.animalhumanesociety.org/" + petObj[0].attributes[0].value + "_blank";
+          pet['site'] = this.url + petObj[0].attributes[0].value;
           dirtyPets.push(pet);
-        }
-
-        // create petid list and get all cached values
-        var petIdList = [];
-        var j;
-        for (j = 0; j < dirtyPets.length; j++) {
-          petIdList.push(dirtyPets[j].id);
+          petIdList.push(pet['id']);
         }
 
         // chrome.storage.local.get(petIdList, result => {
@@ -86,4 +77,9 @@ export class AnimalHumaneSocietyService {
       });
     });
   }
+
+  resolveShelterUrl(type) {
+    return this.url + '/adoption?f%5B0%5D=' + this.petTypeMapping[type];
+  }
+
 }

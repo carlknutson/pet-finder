@@ -16,14 +16,14 @@ export class AppComponent implements OnInit {
   selectedPetType: string;
 
   filterListTypes = [
-    {value: '*', viewValue: 'All Types'},
+    {value: 'all', viewValue: 'All Types'},
     {value: 'dog', viewValue: 'Dog'},
     {value: 'cat', viewValue: 'Cat'},
     {value: 'other', viewValue: 'Other Small Animals'},
   ];
 
   openShelterSite(site:string) {
-    window.open(site);
+    window.open(site, "_blank");
   };
 
   ngOnInit() {
@@ -39,7 +39,6 @@ export class AppComponent implements OnInit {
       this.updatePetList();
     // });
   };
-
 
   updatePetList() {
 

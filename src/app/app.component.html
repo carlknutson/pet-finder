@@ -58,7 +58,7 @@
 
     <div *ngIf="pets.length > 0">
       <div class="polaroid" *ngFor="let pet of pets; let i = index">
-        <img class="hover-on-link" (click)="openShelterSite(pet.id)"
+        <img class="hover-on-link" (click)="openShelterSite(pet.site)"
           src={{pet.img}} width="273" height="200">
         <div class="container">
           <i [ngClass]="{'watched-pet': pet.status == 'W'}"

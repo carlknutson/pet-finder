@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ShelterService } from './services/shelter.service';
+import { ChromeStorageService } from './services/chrome-storage.service';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,8 @@ import { ShelterService } from './services/shelter.service';
 export class AppComponent implements OnInit {
   title = 'PetWatch';
 
-  constructor(private changeDetectorRef: ChangeDetectorRef, private shelterService: ShelterService){ }
+  constructor(private changeDetectorRef: ChangeDetectorRef, private shelterService: ShelterService, 
+              private chromeStorageService: ChromeStorageService){ }
 
   pets = [];
 
@@ -27,27 +29,15 @@ export class AppComponent implements OnInit {
   };
 
   ngOnInit() {
-
-    // chrome.storage.local.get(['filter_type'], result => {
-    //   var cachedType = result['filter_type'];
-    //   if (cachedType == null) {
-    //     console.log('filter_type is empty');
-    //   } else {
-    //     console.log('filter_type has a value of: ' + cachedType);
-    //     this.selectedPetType = cachedType;
-    //   }
+    this.chromeStorageService.getFilterType().then((value:string) => {
+      this.selectedPetType = value;
       this.updatePetList();
-    // });
+    });
   };
 
   updatePetList() {
 
-    // var obj = {};
-    // obj['filter_type'] = this.selectedPetType;
-
-    // chrome.storage.local.set(obj, function() {
-    //   console.log(obj);
-    // });
+    this.chromeStorageService.setFilterType(this.selectedPetType);
 
     this.shelterService.getPets(this.selectedPetType).then(value => {
       console.log(value);

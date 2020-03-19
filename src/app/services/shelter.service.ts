@@ -9,7 +9,7 @@ export class ShelterService {
 
   constructor(private animalHumaneSocietyService: AnimalHumaneSocietyService) { }
 
-  getPets(type) {
+  getPets(type:string) {
     return this.animalHumaneSocietyService.getPets(type);
   }
 }

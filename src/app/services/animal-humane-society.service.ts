@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ChromeStorageService } from './chrome-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AnimalHumaneSocietyService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private chromeStorageService: ChromeStorageService) { }
 
   url: string = 'https://www.animalhumanesociety.org';
 
@@ -49,31 +50,7 @@ export class AnimalHumaneSocietyService {
           petIdList.push(pet['id']);
         }
 
-        // chrome.storage.local.get(petIdList, result => {
-        //   var pets:any[] = [];
-
-        //   console.log(result);
-
-        //   var unwatchedPets = [];
-
-        //   for (var i = 0; i < dirtyPets.length; i++) {
-        //       switch(result[dirtyPets[i].id]) {
-        //         case "D":
-        //           break;
-        //         case "W":
-        //           dirtyPets[i].status = "W";
-        //           pets.push(dirtyPets[i]);
-        //           break;
-        //         default:
-        //           unwatchedPets.push(dirtyPets[i]);
-        //       }
-        //   }
-        //   pets = pets.concat(unwatchedPets);
-        //   console.log("Pet Counter: " + pets.length)
-          // resolve(pets);
-        // });
-
-        resolve(dirtyPets);
+        resolve(this.chromeStorageService.updateWatchHistory(petIdList, dirtyPets));
       });
     });
   }

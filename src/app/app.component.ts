@@ -36,7 +36,6 @@ export class AppComponent implements OnInit {
   };
 
   updatePetList() {
-
     this.chromeStorageService.setFilterType(this.selectedPetType);
 
     this.shelterService.getPets(this.selectedPetType).then(value => {
@@ -49,36 +48,25 @@ export class AppComponent implements OnInit {
   };
 
   hidePet(index, id) {
-    // var obj = {};
-    // obj[id] = "D";
-
-    // chrome.storage.local.set(obj, function() {
-    //   console.log(obj);
-    // });
+    this.chromeStorageService.dismissPet(id);
 
     this.pets.splice(index, 1);
-
-    // needed to notify of model changes
     this.changeDetectorRef.detectChanges();
   };
 
   watchPetToggle(index, id, status) {
-    var cachedObj = {};
-    var newStatus = "";
 
+    // TODO: would boolean take up 4 char in storage?
     if (status == "") {
-      newStatus = "W";
+      status = "W";
+    } else {
+      status = "";
     }
 
-    cachedObj[id] = newStatus;
+    this.chromeStorageService.watchPet(id, status);
 
-    chrome.storage.local.set(cachedObj, function() {
-      console.log(cachedObj);
-    });
-
-    this.pets[index].status = newStatus;
+    this.pets[index].status = status;
     this.changeDetectorRef.detectChanges();
-    
   }
 
   // TODO: remove

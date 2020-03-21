@@ -7,8 +7,44 @@ export class ChromeStorageService {
 
   constructor() { }
 
-  // toggle, allows testing on localhost
-  chromeStorageSwitch = false;
+  chromeStorageSwitch = true;
+
+  // TODO: handle errors / bad cache data
+  updateWatchHistory(petIdList, dirtyPets) {
+
+    if (this.chromeStorageSwitch) {
+      return new Promise((resolve, reject) => {
+
+        chrome.storage.local.get(petIdList, result => {
+              var pets:any[] = [];
+
+              console.log(result);
+
+              var unwatchedPets = [];
+
+              for (var i = 0; i < dirtyPets.length; i++) {
+                  switch(result[dirtyPets[i].id]) {
+                    case "D":
+                      break;
+                    case "W":
+                      dirtyPets[i].status = "W";
+                      pets.push(dirtyPets[i]);
+                      break;
+                    default:
+                      unwatchedPets.push(dirtyPets[i]);
+                  }
+              }
+              pets = pets.concat(unwatchedPets);
+              console.log("Pet Counter: " + pets.length)
+              resolve(pets);
+        });
+      });
+    } else {
+      return new Promise((resolve, reject) => {
+        resolve(dirtyPets);
+      });
+    }
+  }
 
   getFilterType() {
     if (this.chromeStorageSwitch) {
@@ -42,6 +78,29 @@ export class ChromeStorageService {
         console.log("Setting... " + obj);
       });
     }
+  }
+
+  dismissPet(id) {
+    if (this.chromeStorageSwitch) {
+      var obj = {};
+      obj[id] = "D";
+
+      chrome.storage.local.set(obj, function() {
+        console.log("Dismissed pet: " + id);
+      });
+    }
+  }
+
+  watchPet(id, status) {
+    if (this.chromeStorageSwitch) {
+      var obj = {};
+      obj[id] = status;
+
+      chrome.storage.local.set(obj, function() {
+        console.log("Toggle watch ind for: " + id);
+      });
+    }
+    
   }
 
 }

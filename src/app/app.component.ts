@@ -43,8 +43,14 @@ export class AppComponent implements OnInit {
       this.pets = [];
       this.pets = this.pets.concat(value);
       this.changeDetectorRef.detectChanges();
-    })
-    
+    });
+
+    // var pets = this.shelterService.getPets(this.selectedPetType)
+    // console.log(pets);
+      
+    // this.pets = [];
+    // this.pets = this.pets.concat(pets);
+    // this.changeDetectorRef.detectChanges();
   };
 
   hidePet(index, id) {

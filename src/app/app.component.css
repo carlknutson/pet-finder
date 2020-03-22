@@ -77,3 +77,9 @@ mat-select {
   margin-right: 30px;
   margin-left: 40px;
 }
+
+div.crop-photo {
+  width: 273px;
+  height: 200px;
+  overflow: hidden;
+}

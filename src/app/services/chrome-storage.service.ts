@@ -53,18 +53,18 @@ export class ChromeStorageService {
         chrome.storage.local.get(['filter_type'], result => {
           var cachedType:string = result['filter_type'];
           if (cachedType == null) {
-            console.log('filter_type is empty');
-            resolve('');
+            console.log('filter_type is empty, use all');
+            resolve('all');
           } else {
             console.log('filter_type has a value of: ' + cachedType);
-            resolve(cachedType)
+            resolve(cachedType);
           }    
         });
       });
     } else {
       console.log('google storage is off');
       return new Promise((resolve, reject) => {
-        resolve('');
+        resolve('all');
       });
     }    
   }

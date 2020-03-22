@@ -34,7 +34,9 @@ export class EvanstonAnimalShelterService {
     var resolvedLink = this.resolveShelterUrl(type, true);
     return new Promise((resolve, reject) => {
       if (resolvedLink != null) {
-        this.http.get(resolvedLink, { responseType: 'text' }).subscribe(data => {
+        this.http.get(resolvedLink, { responseType: 'text',
+                                      headers: {'X-Requested-With': 'chrome'} 
+                                    }).subscribe(data => {
 
           var pets = [];
           var petIdList = [];

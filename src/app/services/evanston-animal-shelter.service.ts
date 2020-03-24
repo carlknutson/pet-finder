@@ -38,9 +38,6 @@ export class EvanstonAnimalShelterService {
                                       headers: {'X-Requested-With': 'chrome'} 
                                     }).subscribe(data => {
 
-          var pets = [];
-          var petIdList = [];
-  
           var DomParser = require('dom-parser');
           var parser = new DomParser();
           var httpDoc = parser.parseFromString(data,"text/html");

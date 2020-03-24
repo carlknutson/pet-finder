@@ -34,6 +34,10 @@ div.container {
   color: red;
 }
 
+.pet-name {
+  margin: 10px;
+}
+
 .watched-pet {
   color: red;
 }
@@ -79,7 +83,7 @@ mat-select {
 }
 
 div.crop-photo {
-  width: 273px;
-  height: 200px;
+  width: 280px;
+  height: 240px;
   overflow: hidden;
 }

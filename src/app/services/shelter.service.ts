@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AnimalHumaneSocietyService } from './animal-humane-society.service';
 import { EvanstonAnimalShelterService } from './evanston-animal-shelter.service';
+import { PetfinderApiService } from './petfinder-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,8 @@ import { EvanstonAnimalShelterService } from './evanston-animal-shelter.service'
 export class ShelterService {
 
   constructor(private animalHumaneSocietyService: AnimalHumaneSocietyService,
-              private evanstonAnimalShelterService: EvanstonAnimalShelterService) { }
+              private evanstonAnimalShelterService: EvanstonAnimalShelterService,
+              private petFinderApiService: PetfinderApiService) { }
 
   getPets(type:string) {
 
@@ -17,8 +19,8 @@ export class ShelterService {
     return new Promise((resolve, reject) => {
       this.animalHumaneSocietyService.getPets(type).then(value => {
 
-        this.evanstonAnimalShelterService.getPets(type).then(value2 => {
-        resolve(pets.concat(value).concat(value2));
+        this.petFinderApiService.getPets(type).then(value2 => {
+          resolve(pets.concat(value).concat(value2));
         });
       });
     });

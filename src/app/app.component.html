@@ -1,11 +1,17 @@
-<mat-sidenav-container class="example-container">
+<mat-sidenav-container>
   <mat-sidenav #sidenav mode="side" [(opened)]="opened">
     <h2 class="search-criteria-title">
       Search Criteria
     </h2>
+
+    <mat-form-field>
+      <mat-label>Zip Code</mat-label>
+      <input matInput maxlength="5" [(ngModel)]="zip" (ngModelChange)="validateZipAndCall()">
+    </mat-form-field>
+
     <mat-form-field>
       <mat-label>Type</mat-label>
-      <mat-select (selectionChange)="updatePetList()" [(ngModel)]="selectedPetType">
+      <mat-select (selectionChange)="validateZipAndCall()" [(ngModel)]="selectedPetType">
         <mat-option *ngFor="let type of filterListTypes" [value]="type.value">
           {{type.viewValue}}
         </mat-option>
@@ -52,7 +58,7 @@
     <i (click)="sidenav.toggle()" class="font-awesome-nav fa fa-bars" aria-hidden="true"></i>
     <div style="text-align:center">
       <h1 class="petfinder-title">
-        <i id="title-icon" class="awesome-icon fa fa-binoculars" aria-hidden="true" (click)="printCount()"></i> PetWatch
+        <i id="title-icon" class="awesome-icon fa fa-binoculars" aria-hidden="true"></i> PetWatch
       </h1>
     </div>
 
@@ -71,6 +77,33 @@
               (click)="openShelterSite(pet.site)"> {{pet.name}} </h2>
         </div>
       </div>
+    </div>
+
+    <div *ngIf="pets.length == 0 && zip.length == 0" class="criteria-info">
+      <h2>
+        Update the zip code within the side options to retrieve pets.
+      </h2>
+      <img class="hover-on-link" (click)="openShelterSite(pet.site)"
+          src="../assets/dog-using-laptop-computer.jpg">
+    </div>
+
+    <div *ngIf="(pets.length == 0) && (zip.length < 5) && (zip.length > 0)" class="criteria-info">
+      <h2>
+        Hmm, please enter a valid 5 digit zip code.
+      </h2>
+      <img class="hover-on-link" (click)="openShelterSite(pet.site)"
+          src="../assets/dog-using-laptop-computer.jpg">
+    </div>
+
+    <div *ngIf="pets.length == 0 && zip.length==5" class="criteria-info">
+      <h2>
+        Searching for pets...
+      </h2>
+      <h2 *ngIf="noPetsFound">
+        No pets found for zip: {{zip}}, please enter a different zip code.
+      </h2>
+      <img class="hover-on-link" (click)="openShelterSite(pet.site)"
+          src="../assets/dog-using-laptop-computer.jpg">
     </div>
 
   </mat-sidenav-content>

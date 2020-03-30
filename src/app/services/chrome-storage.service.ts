@@ -7,10 +7,10 @@ export class ChromeStorageService {
 
   constructor() { }
 
-  chromeStorageSwitch = true;
+  chromeStorageSwitch = false;
 
   // TODO: handle errors / bad cache data
-  updateWatchHistory(petIdList, dirtyPets) {
+  updateWatchHistory(petIdList, petsFromSite) {
 
     if (this.chromeStorageSwitch) {
       return new Promise((resolve, reject) => {
@@ -18,53 +18,66 @@ export class ChromeStorageService {
         chrome.storage.local.get(petIdList, result => {
               var pets:any[] = [];
 
-              console.log(result);
-
               var unwatchedPets = [];
 
-              for (var i = 0; i < dirtyPets.length; i++) {
-                  switch(result[dirtyPets[i].id]) {
+              for (var i = 0; i < petsFromSite.length; i++) {
+                  switch(result[petsFromSite[i].id]) {
                     case "D":
                       break;
                     case "W":
-                      dirtyPets[i].status = "W";
-                      pets.push(dirtyPets[i]);
+                      petsFromSite[i].status = "W";
+                      pets.push(petsFromSite[i]);
                       break;
                     default:
-                      unwatchedPets.push(dirtyPets[i]);
+                      unwatchedPets.push(petsFromSite[i]);
                   }
               }
               pets = pets.concat(unwatchedPets);
-              console.log("Pet Counter: " + pets.length)
               resolve(pets);
         });
       });
     } else {
       return new Promise((resolve, reject) => {
-        resolve(dirtyPets);
+        resolve(petsFromSite);
       });
     }
   }
 
-  getFilterType() {
+  getSearchCriteria() {
+
+    var obj = { 
+                zipCode: '',
+                filterType: 'all'  
+              };
+
     if (this.chromeStorageSwitch) {
 
       return new Promise((resolve, reject) => {
-        chrome.storage.local.get(['filter_type'], result => {
-          var cachedType:string = result['filter_type'];
-          if (cachedType == null) {
-            console.log('filter_type is empty, use all');
-            resolve('all');
+
+
+        chrome.storage.local.get(['zip_code'], result => {
+          var zip:string = result['zip_code'];
+          if (zip == null) {
+            obj.zipCode = '';
           } else {
-            console.log('filter_type has a value of: ' + cachedType);
-            resolve(cachedType);
-          }    
+            obj.zipCode = zip;
+          }
+          
+          chrome.storage.local.get(['filter_type'], result => {
+            var cachedType:string = result['filter_type'];
+            if (cachedType == null) {
+              obj.filterType = 'all';
+            } else {
+              obj.filterType = cachedType;
+            }
+            resolve(obj);
+          });
         });
       });
     } else {
       console.log('google storage is off');
       return new Promise((resolve, reject) => {
-        resolve('all');
+        resolve(obj);
       });
     }    
   }
@@ -73,6 +86,17 @@ export class ChromeStorageService {
     if (this.chromeStorageSwitch) {
       var obj = {};
       obj['filter_type'] = type;
+
+      chrome.storage.local.set(obj, function() {
+        console.log("Setting... " + obj);
+      });
+    }
+  }
+
+  setZip(zip: string) {
+    if (this.chromeStorageSwitch) {
+      var obj = {};
+      obj['zip_code'] = zip;
 
       chrome.storage.local.set(obj, function() {
         console.log("Setting... " + obj);

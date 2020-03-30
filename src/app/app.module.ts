@@ -5,6 +5,7 @@ import { MatSidenavModule, MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,7 +22,8 @@ import { AppComponent } from './app.component';
     BrowserAnimationsModule,
     MatCheckboxModule,
     FormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

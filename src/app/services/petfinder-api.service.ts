@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ChromeStorageService } from './chrome-storage.service';
-
+import { PETFINDER_CLIENT_ID, PETFINDER_CLIENT_SECRET } from '../api-constants';
 @Injectable({
   providedIn: 'root'
 })
@@ -9,14 +9,20 @@ export class PetfinderApiService {
 
   constructor(private http: HttpClient, private chromeStorageService: ChromeStorageService) { }
 
-  getPets(type) {
+  petTypeMapping = {  dog: 'Dog', 
+                      cat: 'Cat' }
+
+  token: string;
+
+  getPets(zip: string, type: string) {
+
+    var link = this.resolveShelterUrl(zip, type);
+
     return new Promise((resolve, reject) => {
 
       this.getToken().then(headerObj => {
 
-        this.http.get('https://api.petfinder.com/v2/animals?type=Dog&location=60202&sort=distance&limit=100', headerObj).subscribe((data: object) => {
-          console.log(data);
-
+        this.http.get(link, headerObj).subscribe((data: object) => {
             var pets = [];
             var petIdList = [];
 
@@ -29,7 +35,13 @@ export class PetfinderApiService {
 
               pet['name'] = this.cleanName(apiPets[i].name);
               pet['id'] = String(apiPets[i].id);
-              pet['img'] = apiPets[i].photos[0].medium;
+
+              if (apiPets[i].photos.length > 0) {
+                pet['img'] = apiPets[i].photos[0].medium;
+              } else {
+                // if no photo of dog, use public domain image
+                pet ['img'] = '../assets/dog-using-laptop-computer.jpg'
+              }
               pet['status'] = '';
               pet['site'] = apiPets[i].url;
 
@@ -37,16 +49,25 @@ export class PetfinderApiService {
               pets.push(pet);
             }
 
-            console.log(petIdList);
-            console.log(pets);
-
             resolve(this.chromeStorageService.updateWatchHistory(petIdList, pets));
-        });
+        },
+        error => {
+          console.error("error retrieving pets in petfinder, resolving to empty list");
+          reject();
+        }
+        );
       });
     });
   }
 
-  // TODO: helper for other shelters?
+  resolveShelterUrl(zip: string, type: string) {
+    if (type == 'all') {
+      return 'https://api.petfinder.com/v2/animals?location=' + zip + '&sort=distance&limit=25';
+    } else {
+      return 'https://api.petfinder.com/v2/animals?type=' + this.petTypeMapping[type] + '&location=' + zip + '&sort=distance&limit=25';
+    }
+  }
+
   cleanName(name: string) {
     var cleanName: string = name;
 
@@ -57,26 +78,32 @@ export class PetfinderApiService {
     return cleanName;
   }
 
-  // TODO: token service, give back non-expired, otherwise make new token
   getToken() {
     return new Promise((resolve, reject) => {
-      let body = new URLSearchParams();
-      body.set('grant_type', 'client_credentials');
-      body.set('client_id', '-');
-      body.set('client_secret', '-');
-  
-      let options = {
-        headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
-      };
-  
-      this.http
-        .post('https://api.petfinder.com/v2/oauth2/token', body.toString(), options)
-        .subscribe(data => {
-          console.log(data);
-          resolve({headers: new HttpHeaders().set("Authorization", "Bearer " + data['access_token'])});
-        });
-    });
+      if (this.token) {
+
+        // TODO: look into logic to determine if time has expired token, if so
+        console.log("using stored token");
+        resolve({headers: new HttpHeaders().set("Authorization", "Bearer " + this.token)});
+      } else {
+        console.log("grabbing new token");
+        let body = new URLSearchParams();
+        body.set('grant_type', 'client_credentials');
+        body.set('client_id', PETFINDER_CLIENT_ID);
+        body.set('client_secret', PETFINDER_CLIENT_SECRET);
     
+        let options = {
+          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
+        };
+    
+        this.http
+          .post('https://api.petfinder.com/v2/oauth2/token', body.toString(), options)
+          .subscribe(data => {
+            this.token = data['access_token'];
+            resolve({headers: new HttpHeaders().set("Authorization", "Bearer " + data['access_token'])});
+          });
+      }
+    });
   }
 
 

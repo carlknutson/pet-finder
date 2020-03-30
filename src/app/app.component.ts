@@ -14,14 +14,16 @@ export class AppComponent implements OnInit {
               private chromeStorageService: ChromeStorageService){ }
 
   pets = [];
+  noPetsFound = false;
 
   selectedPetType: string;
+  zip: string = '';
 
   filterListTypes = [
     {value: 'all', viewValue: 'All Types'},
     {value: 'dog', viewValue: 'Dog'},
     {value: 'cat', viewValue: 'Cat'},
-    {value: 'other', viewValue: 'Other Small Animals'},
+    // {value: 'other', viewValue: 'Other Small Animals'},
   ];
 
   openShelterSite(site:string) {
@@ -29,28 +31,32 @@ export class AppComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.chromeStorageService.getFilterType().then((value:string) => {
-      this.selectedPetType = value;
-      this.updatePetList();
+    this.chromeStorageService.getSearchCriteria().then((value:object) => {
+      this.zip = value['zipCode'];
+      this.selectedPetType = value['filterType'];
+      this.validateZipAndCall();
     });
   };
 
   updatePetList() {
+    this.chromeStorageService.setZip(this.zip);
     this.chromeStorageService.setFilterType(this.selectedPetType);
 
-    this.shelterService.getPets(this.selectedPetType).then(value => {
-      console.log(value);
+    this.shelterService.getPets(this.zip, this.selectedPetType).then((value: object[]) => {
       this.pets = [];
       this.pets = this.pets.concat(value);
-      this.changeDetectorRef.detectChanges();
-    });
-
-    // var pets = this.shelterService.getPets(this.selectedPetType)
-    // console.log(pets);
       
-    // this.pets = [];
-    // this.pets = this.pets.concat(pets);
-    // this.changeDetectorRef.detectChanges();
+      if (value.length == 0) {
+        this.noPetsFound = true;
+      } else {
+        this.noPetsFound = false;
+      }
+
+      this.changeDetectorRef.detectChanges();
+    },
+    error => {
+      this.noPetsFound = true;
+    });
   };
 
   hidePet(index, id) {
@@ -75,9 +81,13 @@ export class AppComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  // TODO: remove
-  printCount() {
-    console.log("Count of the pets: " + this.pets.length);
+  validateZipAndCall() {
+    if (this.zip.length == 5) {
+      this.noPetsFound = false;
+      this.updatePetList();
+    } else {
+      this.pets = [];
+    }
   }
 
 }

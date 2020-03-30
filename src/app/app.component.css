@@ -87,3 +87,7 @@ div.crop-photo {
   height: 240px;
   overflow: hidden;
 }
+
+.criteria-info {
+  padding-left: 55px;
+}

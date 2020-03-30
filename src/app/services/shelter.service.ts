@@ -12,16 +12,21 @@ export class ShelterService {
               private evanstonAnimalShelterService: EvanstonAnimalShelterService,
               private petFinderApiService: PetfinderApiService) { }
 
-  getPets(type:string) {
+  getPets(zip:string, type:string) {
 
     var pets = [];
-    console.log(type);
     return new Promise((resolve, reject) => {
-      this.animalHumaneSocietyService.getPets(type).then(value => {
+      // this.animalHumaneSocietyService.getPets(type).then(value => {
 
-        this.petFinderApiService.getPets(type).then(value2 => {
-          resolve(pets.concat(value).concat(value2));
-        });
+      //   this.petFinderApiService.getPets(zip, type).then(value2 => {
+      //     resolve(pets.concat(value).concat(value2));
+      //   });
+      // });
+      this.petFinderApiService.getPets(zip, type).then(value => {
+            resolve(value);
+        },
+        error => {
+        reject();
       });
     });
   }

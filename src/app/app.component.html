@@ -77,6 +77,11 @@
               (click)="openShelterSite(pet.site)"> {{pet.name}} </h2>
         </div>
       </div>
+      <div class="polaroid">
+        <h1 class="loading-icons">
+          <i id="title-icon" class="awesome-icon fa fa-ellipsis-h" aria-hidden="true" (click)="validateZipAndCall()"></i>
+        </h1>
+      </div>
     </div>
 
     <div *ngIf="pets.length == 0 && zip.length == 0" class="criteria-info">

@@ -22,7 +22,7 @@ export class ShelterService {
       //     resolve(pets.concat(value).concat(value2));
       //   });
       // });
-      this.petFinderApiService.getPets(zip, type).then(value => {
+      this.petFinderApiService.getPets(zip, type, 1).then(value => {
             resolve(value);
         },
         error => {

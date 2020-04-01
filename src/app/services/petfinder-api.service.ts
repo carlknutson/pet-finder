@@ -14,9 +14,12 @@ export class PetfinderApiService {
 
   token: string;
 
-  getPets(zip: string, type: string) {
+  unwatchedPets: object[] = [];
+  watchedPets: object[] = [];
 
-    var link = this.resolveShelterUrl(zip, type);
+  getPets(zip: string, type: string, page: number) {
+    console.log(page);
+    var link = this.resolveShelterUrl(zip, type, page);
 
     return new Promise((resolve, reject) => {
 
@@ -48,8 +51,25 @@ export class PetfinderApiService {
               petIdList.push(pet['id']);
               pets.push(pet);
             }
+            
+            this.chromeStorageService.updateWatchHistory(petIdList, pets).then((petLists:object) => {
+              console.log(petLists);
+              this.unwatchedPets = this.unwatchedPets.concat(petLists['unwatched']);
+              this.watchedPets = this.watchedPets.concat(petLists['watched']);
+              var totalPages = data["pagination"]["total_pages"];
 
-            resolve(this.chromeStorageService.updateWatchHistory(petIdList, pets));
+              console.log(this.unwatchedPets);
+
+              if (this.unwatchedPets.length + this.watchedPets.length < 50 && (page != totalPages)) {
+                var increasePage = page + 1;
+                resolve(this.getPets(zip, type, increasePage));
+              } else {
+                resolve(this.watchedPets.concat(this.unwatchedPets));
+                console.log(this.watchedPets.concat(this.unwatchedPets));
+                this.watchedPets = [];
+                this.unwatchedPets = [];
+              }
+            });
         },
         error => {
           console.error("error retrieving pets in petfinder, resolving to empty list");
@@ -60,11 +80,11 @@ export class PetfinderApiService {
     });
   }
 
-  resolveShelterUrl(zip: string, type: string) {
+  resolveShelterUrl(zip: string, type: string, page: number) {
     if (type == 'all') {
-      return 'https://api.petfinder.com/v2/animals?location=' + zip + '&sort=distance&limit=25';
+      return 'https://api.petfinder.com/v2/animals?location=' + zip + '&sort=distance&limit=50&page=' + page;
     } else {
-      return 'https://api.petfinder.com/v2/animals?type=' + this.petTypeMapping[type] + '&location=' + zip + '&sort=distance&limit=25';
+      return 'https://api.petfinder.com/v2/animals?type=' + this.petTypeMapping[type] + '&location=' + zip + '&sort=distance&limit=50&page=' + page;
     }
   }
 

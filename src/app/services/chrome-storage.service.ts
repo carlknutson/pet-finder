@@ -7,10 +7,15 @@ export class ChromeStorageService {
 
   constructor() { }
 
-  chromeStorageSwitch = false;
+  chromeStorageSwitch = true;
 
   // TODO: handle errors / bad cache data
   updateWatchHistory(petIdList, petsFromSite) {
+
+    var petLists = {
+      'watched': [],
+      'unwatched': []
+    }
 
     if (this.chromeStorageSwitch) {
       return new Promise((resolve, reject) => {
@@ -32,13 +37,16 @@ export class ChromeStorageService {
                       unwatchedPets.push(petsFromSite[i]);
                   }
               }
-              pets = pets.concat(unwatchedPets);
-              resolve(pets);
+              petLists.watched = pets;
+              petLists.unwatched = unwatchedPets;
+
+              resolve(petLists);
         });
       });
     } else {
       return new Promise((resolve, reject) => {
-        resolve(petsFromSite);
+        petLists.unwatched = petsFromSite;
+        resolve(petLists);
       });
     }
   }

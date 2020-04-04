@@ -1,214 +1,193 @@
-import { Injectable } from '@angular/core';
-import { watch } from 'fs';
+import { Injectable } from "@angular/core";
+import { watch } from "fs";
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: "root",
 })
 export class ChromeStorageService {
+	constructor() {}
 
-  constructor() { }
+	chromeStorageSwitch = true;
 
-  chromeStorageSwitch = true;
+	updateWatchHistory(petIdList, petsFromSite) {
+		if (this.chromeStorageSwitch) {
+			return new Promise((resolve, reject) => {
+				chrome.storage.local.get(petIdList, (result) => {
+					const unwatchedPets: any[] = [];
 
-  updateWatchHistory(petIdList, petsFromSite) {
+					petsFromSite.forEach((pet) => {
+						if (result[pet.id] === undefined) {
+							unwatchedPets.push(pet);
+						}
+					});
 
-    if (this.chromeStorageSwitch) {
-      return new Promise((resolve, reject) => {
+					resolve(unwatchedPets);
+				});
+			});
+		} else {
+			return new Promise((resolve, reject) => {
+				resolve(petsFromSite);
+			});
+		}
+	}
 
-        chrome.storage.local.get(petIdList, result => {
-          const unwatchedPets: any[] = [];
+	getSearchCriteria() {
+		const obj = {
+			zipCode: "",
+			filterType: "all",
+		};
 
-          petsFromSite.forEach(pet => {
-            if (result[pet.id] === undefined) {
-              unwatchedPets.push(pet);
-            }
-          });
+		if (this.chromeStorageSwitch) {
+			return new Promise((resolve, reject) => {
+				chrome.storage.local.get(["zip_code"], (result) => {
+					const zip: string = result.zip_code;
+					if (zip == null) {
+						obj.zipCode = "";
+					} else {
+						obj.zipCode = zip;
+					}
 
-          resolve(unwatchedPets);
-        });
+					chrome.storage.local.get(["filter_type"], (typeResult) => {
+						const cachedType: string = typeResult.filter_type;
+						if (cachedType == null) {
+							obj.filterType = "all";
+						} else {
+							obj.filterType = cachedType;
+						}
+						resolve(obj);
+					});
+				});
+			});
+		} else {
+			console.log("google storage is off");
+			return new Promise((resolve, reject) => {
+				resolve(obj);
+			});
+		}
+	}
 
-      });
-    } else {
-      return new Promise((resolve, reject) => {
-        resolve(petsFromSite);
-      });
-    }
-  }
+	setFilterType(type) {
+		if (this.chromeStorageSwitch) {
+			const obj = {
+				filter_type: "",
+			};
+			obj.filter_type = type;
 
-  getSearchCriteria() {
+			chrome.storage.local.set(obj);
+		}
+	}
 
-    const obj = {
-                zipCode: '',
-                filterType: 'all'
-              };
+	setZip(zip: string) {
+		if (this.chromeStorageSwitch) {
+			const obj = {
+				zip_code: "",
+			};
+			obj.zip_code = zip;
 
-    if (this.chromeStorageSwitch) {
+			chrome.storage.local.set(obj);
+		}
+	}
 
-      return new Promise((resolve, reject) => {
+	dismissPet(id, type) {
+		if (this.chromeStorageSwitch) {
+			this.removeFromWatchedList(id, type);
+			const obj = {};
+			obj[id] = "D";
 
+			chrome.storage.local.set(obj);
+		}
+	}
 
-        chrome.storage.local.get(['zip_code'], result => {
-          const zip: string = result.zip_code;
-          if (zip == null) {
-            obj.zipCode = '';
-          } else {
-            obj.zipCode = zip;
-          }
+	setPetInfo(petInfo) {
+		if (this.chromeStorageSwitch) {
+			const obj = {};
+			obj[petInfo.id] = petInfo;
 
-          chrome.storage.local.get(['filter_type'], typeResult => {
-            const cachedType: string = typeResult.filter_type;
-            if (cachedType == null) {
-              obj.filterType = 'all';
-            } else {
-              obj.filterType = cachedType;
-            }
-            resolve(obj);
-          });
-        });
-      });
-    } else {
-      console.log('google storage is off');
-      return new Promise((resolve, reject) => {
-        resolve(obj);
-      });
-    }
-  }
+			chrome.storage.local.set(obj);
+		}
+	}
 
-  setFilterType(type) {
-    if (this.chromeStorageSwitch) {
-      const obj = {
-        filter_type: ''
-      };
-      obj.filter_type = type;
+	removeFromWatchedList(id, type) {
+		if (this.chromeStorageSwitch) {
+			chrome.storage.local.get([type], (result) => {
+				const storedWatchedList = result[type];
 
-      chrome.storage.local.set(obj);
-    }
-  }
+				if (storedWatchedList !== undefined) {
+					const index = storedWatchedList.indexOf(id);
+					if (index > -1) {
+						storedWatchedList.splice(index, 1);
+					} else {
+						console.log("trying to remove id from watch list, but does not exist: " + id);
+					}
 
-  setZip(zip: string) {
-    if (this.chromeStorageSwitch) {
-      const obj = {
-        zip_code: ''
-      };
-      obj.zip_code = zip;
+					const obj = {};
+					obj[type] = storedWatchedList;
+					chrome.storage.local.set(obj);
+				}
+			});
+		}
+	}
 
-      chrome.storage.local.set(obj);
+	addToWatchedList(id, type) {
+		if (this.chromeStorageSwitch) {
+			chrome.storage.local.get([type], (result) => {
+				const storedWatchedList = result[type];
 
-    }
-  }
+				let watched = [];
 
-  dismissPet(id, type) {
-    if (this.chromeStorageSwitch) {
+				if (storedWatchedList === undefined) {
+					watched.push(id);
+				} else {
+					storedWatchedList.push(id);
+					watched = storedWatchedList;
+				}
 
-      this.removeFromWatchedList(id, type);
-      const obj = {};
-      obj[id] = 'D';
+				const obj = {};
+				obj[type] = watched;
 
-      chrome.storage.local.set(obj);
+				chrome.storage.local.set(obj);
+			});
+		}
+	}
 
-    }
-  }
+	getWatchedPets(type: string) {
+		if (this.chromeStorageSwitch) {
+			return new Promise((resolve, reject) => {
+				const pets = [];
+				let petTypes = [];
 
-  setPetInfo(petInfo) {
-    if (this.chromeStorageSwitch) {
+				if (type === "all") {
+					petTypes = ["dog", "cat"];
+				} else {
+					petTypes.push(type);
+				}
 
-      const obj = {};
-      obj[petInfo.id] = petInfo;
+				chrome.storage.local.get(petTypes, (results) => {
+					let watchedList = [];
 
-      chrome.storage.local.set(obj);
+					petTypes.forEach((petType) => {
+						if (results[petType] !== undefined) {
+							watchedList = watchedList.concat(results[petType]);
+						}
+					});
 
-    }
-  }
+					if (watchedList.length === 0) {
+						resolve([]);
+					} else {
+						chrome.storage.local.get(watchedList, (result) => {
+							watchedList.forEach((watchedPet) => {
+								pets.push(result[watchedPet]);
+							});
 
-  removeFromWatchedList(id, type) {
-    if (this.chromeStorageSwitch) {
-      chrome.storage.local.get([type], result => {
-        const storedWatchedList = result[type];
-
-        if (storedWatchedList !== undefined) {
-          const index = storedWatchedList.indexOf(id);
-          if (index > -1) {
-            storedWatchedList.splice(index, 1);
-          } else {
-            console.log('trying to remove id from watch list, but does not exist: ' + id);
-          }
-
-          const obj = {};
-          obj[type] = storedWatchedList;
-          chrome.storage.local.set(obj);
-
-        }
-      });
-    }
-  }
-
-  addToWatchedList(id, type) {
-    if (this.chromeStorageSwitch) {
-
-      chrome.storage.local.get([type], result => {
-
-        const storedWatchedList = result[type];
-
-        let watched = [];
-
-        if (storedWatchedList === undefined) {
-          watched.push(id);
-        } else {
-          storedWatchedList.push(id);
-          watched = storedWatchedList;
-        }
-
-
-        const obj = {};
-        obj[type] = watched;
-
-        chrome.storage.local.set(obj);
-      });
-    }
-  }
-
-  getWatchedPets(type: string) {
-    if (this.chromeStorageSwitch) {
-      return new Promise((resolve, reject) => {
-        const pets = [];
-        let petTypes = [];
-
-        if (type === 'all') {
-          petTypes = ['dog', 'cat'];
-        } else {
-          petTypes.push(type);
-        }
-
-        chrome.storage.local.get(petTypes, results => {
-
-          let watchedList = [];
-
-          petTypes.forEach(petType => {
-            if (results[petType] !== undefined) {
-              watchedList = watchedList.concat(results[petType]);
-            }
-          });
-
-          if (watchedList.length === 0) {
-            resolve([]);
-          } else {
-            chrome.storage.local.get(watchedList, result => {
-
-              watchedList.forEach(watchedPet => {
-                pets.push(result[watchedPet]);
-              });
-
-              resolve(pets);
-
-            });
-          }
-        });
-      });
-    } else {
-      return new Promise((resolve, reject) => {
-        resolve([]);
-      });
-    }
-  }
-
+							resolve(pets);
+						});
+					}
+				});
+			});
+		} else {
+			return new Promise((resolve, reject) => {
+				resolve([]);
+			});
+		}
+	}
 }

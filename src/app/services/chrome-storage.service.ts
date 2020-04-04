@@ -10,22 +10,23 @@ export class ChromeStorageService {
 
   chromeStorageSwitch = true;
 
-  // TODO: handle errors / bad cache data
   updateWatchHistory(petIdList, petsFromSite) {
 
     if (this.chromeStorageSwitch) {
       return new Promise((resolve, reject) => {
 
         chrome.storage.local.get(petIdList, result => {
-          var unwatchedPets:any[] = [];
+          const unwatchedPets: any[] = [];
 
-          for (var i = 0; i < petsFromSite.length; i++) {
-              if (result[petsFromSite[i].id]== undefined) {
-                  unwatchedPets.push(petsFromSite[i]);
-              }
-          }
+          petsFromSite.forEach(pet => {
+            if (result[pet.id] === undefined) {
+              unwatchedPets.push(pet);
+            }
+          });
+
           resolve(unwatchedPets);
         });
+
       });
     } else {
       return new Promise((resolve, reject) => {
@@ -36,9 +37,9 @@ export class ChromeStorageService {
 
   getSearchCriteria() {
 
-    var obj = { 
+    const obj = {
                 zipCode: '',
-                filterType: 'all'  
+                filterType: 'all'
               };
 
     if (this.chromeStorageSwitch) {
@@ -47,15 +48,15 @@ export class ChromeStorageService {
 
 
         chrome.storage.local.get(['zip_code'], result => {
-          var zip:string = result['zip_code'];
+          const zip: string = result.zip_code;
           if (zip == null) {
             obj.zipCode = '';
           } else {
             obj.zipCode = zip;
           }
-          
-          chrome.storage.local.get(['filter_type'], result => {
-            var cachedType:string = result['filter_type'];
+
+          chrome.storage.local.get(['filter_type'], typeResult => {
+            const cachedType: string = typeResult.filter_type;
             if (cachedType == null) {
               obj.filterType = 'all';
             } else {
@@ -70,94 +71,87 @@ export class ChromeStorageService {
       return new Promise((resolve, reject) => {
         resolve(obj);
       });
-    }    
+    }
   }
 
   setFilterType(type) {
     if (this.chromeStorageSwitch) {
-      var obj = {};
-      obj['filter_type'] = type;
+      const obj = {
+        filter_type: ''
+      };
+      obj.filter_type = type;
 
-      chrome.storage.local.set(obj, function() {
-        console.log("Setting... " + obj);
-      });
+      chrome.storage.local.set(obj);
     }
   }
 
   setZip(zip: string) {
     if (this.chromeStorageSwitch) {
-      var obj = {};
-      obj['zip_code'] = zip;
+      const obj = {
+        zip_code: ''
+      };
+      obj.zip_code = zip;
 
-      chrome.storage.local.set(obj, function() {
-        console.log("Setting... " + obj);
-      });
+      chrome.storage.local.set(obj);
+
     }
   }
 
   dismissPet(id, type) {
     if (this.chromeStorageSwitch) {
-      
-      this.removeFromWatchedList(id, type);
-      var obj = {};
-      obj[id] = "D";
 
-      chrome.storage.local.set(obj, function() {
-        console.log("Dismissed pet: " + id);
-      });
+      this.removeFromWatchedList(id, type);
+      const obj = {};
+      obj[id] = 'D';
+
+      chrome.storage.local.set(obj);
+
     }
   }
 
   setPetInfo(petInfo) {
     if (this.chromeStorageSwitch) {
 
-      var obj = {};
-      obj[petInfo['id']] = petInfo;
+      const obj = {};
+      obj[petInfo.id] = petInfo;
 
-      chrome.storage.local.set(obj, function() {
-        console.log("Toggle watch ind for: " + petInfo.id);
-      });
-    } 
+      chrome.storage.local.set(obj);
+
+    }
   }
 
   removeFromWatchedList(id, type) {
     if (this.chromeStorageSwitch) {
       chrome.storage.local.get([type], result => {
-        var storedWatchedList = result[type];
-        console.log(storedWatchedList);
+        const storedWatchedList = result[type];
 
-        if (storedWatchedList != undefined) {
-          var index = storedWatchedList.indexOf(id);
+        if (storedWatchedList !== undefined) {
+          const index = storedWatchedList.indexOf(id);
           if (index > -1) {
             storedWatchedList.splice(index, 1);
           } else {
-            console.log("trying to remove id from watch list, but does not exist: " + id);
+            console.log('trying to remove id from watch list, but does not exist: ' + id);
           }
 
-          var obj = {};
+          const obj = {};
           obj[type] = storedWatchedList;
+          chrome.storage.local.set(obj);
 
-          chrome.storage.local.set(obj, function() {
-            console.log("Setting watched list after removal");
-            console.log(storedWatchedList);
-          });
         }
       });
     }
   }
-  
+
   addToWatchedList(id, type) {
     if (this.chromeStorageSwitch) {
 
       chrome.storage.local.get([type], result => {
 
-        var storedWatchedList = result[type];
+        const storedWatchedList = result[type];
 
-        console.log(storedWatchedList);
+        let watched = [];
 
-        var watched = [];
-        // TODO: ensure this is set at beginning of extension and then refactor
-        if (storedWatchedList == undefined) {
+        if (storedWatchedList === undefined) {
           watched.push(id);
         } else {
           storedWatchedList.push(id);
@@ -165,56 +159,52 @@ export class ChromeStorageService {
         }
 
 
-        var obj = {};
+        const obj = {};
         obj[type] = watched;
 
-        chrome.storage.local.set(obj, function() {
-          console.log("Setting watched list");
-          console.log(watched);
-        });
+        chrome.storage.local.set(obj);
       });
     }
   }
 
-  getWatchedPets (type: string) {
+  getWatchedPets(type: string) {
     if (this.chromeStorageSwitch) {
       return new Promise((resolve, reject) => {
-        var pets = [];
-        var petTypes = [];
+        const pets = [];
+        let petTypes = [];
 
-        if (type == 'all') {
-          petTypes = ['dog', 'cat'];            
+        if (type === 'all') {
+          petTypes = ['dog', 'cat'];
         } else {
           petTypes.push(type);
         }
 
         chrome.storage.local.get(petTypes, results => {
 
-          var watchedList = [];
+          let watchedList = [];
 
-          for (var i = 0; i < petTypes.length; i++) {
-
-            if (results[petTypes[i]] != undefined) {
-              watchedList = watchedList.concat(results[petTypes[i]]);
+          petTypes.forEach(petType => {
+            if (results[petType] !== undefined) {
+              watchedList = watchedList.concat(results[petType]);
             }
-          }
+          });
 
-          if (watchedList.length == 0) {
+          if (watchedList.length === 0) {
             resolve([]);
           } else {
             chrome.storage.local.get(watchedList, result => {
 
-              for (var i = 0; i < watchedList.length; i++) {
-                pets.push(result[watchedList[i]]);
-              }
-              console.log(pets);
-              resolve(pets)
+              watchedList.forEach(watchedPet => {
+                pets.push(result[watchedPet]);
+              });
+
+              resolve(pets);
+
             });
           }
         });
       });
-    }
-    else {
+    } else {
       return new Promise((resolve, reject) => {
         resolve([]);
       });

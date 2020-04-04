@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ShelterService } from './services/shelter.service';
 import { ChromeStorageService } from './services/chrome-storage.service';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ export class AppComponent implements OnInit {
   title = 'PetWatch';
 
   constructor(private changeDetectorRef: ChangeDetectorRef, private shelterService: ShelterService, 
-              private chromeStorageService: ChromeStorageService){ }
+              private chromeStorageService: ChromeStorageService, private spinnerService: Ng4LoadingSpinnerService) { }
 
   pets = [];
   noPetsFound = false;
@@ -39,6 +40,8 @@ export class AppComponent implements OnInit {
   };
 
   updatePetList() {
+    this.spinnerService.show();
+
     this.chromeStorageService.setZip(this.zip);
     this.chromeStorageService.setFilterType(this.selectedPetType);
 
@@ -53,31 +56,33 @@ export class AppComponent implements OnInit {
       }
 
       this.changeDetectorRef.detectChanges();
+      this.spinnerService.hide();
     },
     error => {
       this.noPetsFound = true;
     });
   };
 
-  hidePet(index, id) {
-    this.chromeStorageService.dismissPet(id);
+  hidePet(index, pet) {
+    this.chromeStorageService.dismissPet(pet.id, pet.type);
 
     this.pets.splice(index, 1);
     this.changeDetectorRef.detectChanges();
   };
 
-  watchPetToggle(index, id, status) {
+  watchPetToggle(pet) {
 
-    // TODO: would boolean take up 4 char in storage?
-    if (status == "") {
-      status = "W";
+    if (pet.status == 'W') {
+      pet.status = '';
+      this.chromeStorageService.removeFromWatchedList(pet.id, pet.type);
+      this.chromeStorageService.setPetInfo(pet);
+
     } else {
-      status = "";
+      pet.status = 'W';
+      this.chromeStorageService.addToWatchedList(pet.id, pet.type);
+      this.chromeStorageService.setPetInfo(pet);
     }
 
-    this.chromeStorageService.watchPet(id, status);
-
-    this.pets[index].status = status;
     this.changeDetectorRef.detectChanges();
   }
 

@@ -37,6 +37,7 @@ export class PetfinderApiService {
               var pet = {};
 
               pet['name'] = this.cleanName(apiPets[i].name);
+              pet['type'] = apiPets[i].type.toLowerCase();
               pet['id'] = String(apiPets[i].id);
 
               if (apiPets[i].photos.length > 0) {
@@ -52,13 +53,10 @@ export class PetfinderApiService {
               pets.push(pet);
             }
             
-            this.chromeStorageService.updateWatchHistory(petIdList, pets).then((petLists:object) => {
-              console.log(petLists);
-              this.unwatchedPets = this.unwatchedPets.concat(petLists['unwatched']);
-              this.watchedPets = this.watchedPets.concat(petLists['watched']);
+            this.chromeStorageService.updateWatchHistory(petIdList, pets).then((newUnwatchedPets: object[]) => {
+              console.log(newUnwatchedPets);
+              this.unwatchedPets = this.unwatchedPets.concat(newUnwatchedPets);
               var totalPages = data["pagination"]["total_pages"];
-
-              console.log(this.unwatchedPets);
 
               if (this.unwatchedPets.length + this.watchedPets.length < 50 && (page != totalPages)) {
                 var increasePage = page + 1;

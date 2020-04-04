@@ -71,8 +71,8 @@
         <div class="container">
           <i [ngClass]="{'watched-pet': pet.status == 'W'}"
               class="hover-on-icon awesome-icon fa fa-heart fa-2x" aria-hidden="true"
-              (click)="watchPetToggle(i, pet.id, pet.status)"></i>
-          <i class="hover-on-icon awesome-icon fa fa-times fa-2x" (click)="hidePet(i, pet.id)" aria-hidden="true"></i>
+              (click)="watchPetToggle(pet)"></i>
+          <i class="hover-on-icon awesome-icon fa fa-times fa-2x" (click)="hidePet(i, pet)" aria-hidden="true"></i>
           <h2 class="hover-on-link pet-name"
               (click)="openShelterSite(pet.site)"> {{pet.name}} </h2>
         </div>
@@ -113,5 +113,7 @@
 
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<ng4-loading-spinner> </ng4-loading-spinner>
 
 <router-outlet></router-outlet>

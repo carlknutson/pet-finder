@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AnimalHumaneSocietyService } from './animal-humane-society.service';
 import { EvanstonAnimalShelterService } from './evanston-animal-shelter.service';
 import { PetfinderApiService } from './petfinder-api.service';
+import { ChromeStorageService } from './chrome-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ export class ShelterService {
 
   constructor(private animalHumaneSocietyService: AnimalHumaneSocietyService,
               private evanstonAnimalShelterService: EvanstonAnimalShelterService,
-              private petFinderApiService: PetfinderApiService) { }
+              private petFinderApiService: PetfinderApiService,
+              private chromeStorageService: ChromeStorageService) { }
 
   getPets(zip:string, type:string) {
 
@@ -22,11 +24,15 @@ export class ShelterService {
       //     resolve(pets.concat(value).concat(value2));
       //   });
       // });
-      this.petFinderApiService.getPets(zip, type, 1).then(value => {
-            resolve(value);
+
+      // TODO: based on type, get corresponding watched list
+      this.chromeStorageService.getWatchedPets(type).then((watchedPets:any[]) => {
+        this.petFinderApiService.getPets(zip, type, 1).then((petFinderPets:any[]) => {
+          resolve(watchedPets.concat(petFinderPets));
         },
         error => {
         reject();
+        });
       });
     });
   }

@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ShelterService } from './services/shelter.service';
 import { ChromeStorageService } from './services/chrome-storage.service';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +14,8 @@ export class AppComponent implements OnInit {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private shelterService: ShelterService,
-    private chromeStorageService: ChromeStorageService // private spinnerService: Ng4LoadingSpinnerService
+    private chromeStorageService: ChromeStorageService,
+    private spinner: NgxSpinnerService
   ) {}
 
   pets = [];
@@ -43,7 +44,7 @@ export class AppComponent implements OnInit {
   }
 
   updatePetList() {
-    // this.spinnerService.show();
+    this.spinner.show();
 
     this.chromeStorageService.setZip(this.zip);
     this.chromeStorageService.setFilterType(this.selectedPetType);
@@ -60,7 +61,7 @@ export class AppComponent implements OnInit {
         }
 
         this.changeDetectorRef.detectChanges();
-        // this.spinnerService.hide();
+        this.spinner.hide();
       },
       (error) => {
         this.noPetsFound = true;

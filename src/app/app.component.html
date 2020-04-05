@@ -1,19 +1,19 @@
 <mat-sidenav-container>
-  <mat-sidenav #sidenav mode="side" [(opened)]="opened">
+  <mat-sidenav #sidenav mode="over">
     <h2 class="search-criteria-title">
       Search Criteria
     </h2>
 
     <mat-form-field>
       <mat-label>Zip Code</mat-label>
-      <input matInput maxlength="5" [(ngModel)]="zip" (ngModelChange)="validateZipAndCall()">
+      <input matInput maxlength="5" [(ngModel)]="zip" (ngModelChange)="validateZipAndCall()" />
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Type</mat-label>
       <mat-select (selectionChange)="validateZipAndCall()" [(ngModel)]="selectedPetType">
         <mat-option *ngFor="let type of filterListTypes" [value]="type.value">
-          {{type.viewValue}}
+          {{ type.viewValue }}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -55,31 +55,40 @@
     </mat-form-field> -->
   </mat-sidenav>
   <mat-sidenav-content>
-    <i (click)="sidenav.toggle()" class="font-awesome-nav fa fa-bars" aria-hidden="true"></i>
-    <div style="text-align:center">
+    <i (click)="sidenav.toggle(); detectChange()" class="font-awesome-nav fa fa-bars" aria-hidden="true"></i>
+    <div style="text-align: center;">
       <h1 class="petfinder-title">
-        <i id="title-icon" class="awesome-icon fa fa-binoculars" aria-hidden="true"></i> PetWatch
+        <i id="title-icon" class="awesome-icon fa fa-binoculars" aria-hidden="true"></i>
+        PetWatch
       </h1>
     </div>
 
     <div *ngIf="pets.length > 0">
       <div class="polaroid" *ngFor="let pet of pets; let i = index">
         <div class="crop-photo">
-          <img class="hover-on-link" (click)="openShelterSite(pet.site)"
-          src={{pet.img}} >
+          <img class="hover-on-link" (click)="openShelterSite(pet.site)" src="{{ pet.img }}" />
         </div>
         <div class="container">
-          <i [ngClass]="{'watched-pet': pet.status == 'W'}"
-              class="hover-on-icon awesome-icon fa fa-heart fa-2x" aria-hidden="true"
-              (click)="watchPetToggle(pet)"></i>
+          <i
+            [ngClass]="{ 'watched-pet': pet.status == 'W' }"
+            class="hover-on-icon awesome-icon fa fa-heart fa-2x"
+            aria-hidden="true"
+            (click)="watchPetToggle(pet)"
+          ></i>
           <i class="hover-on-icon awesome-icon fa fa-times fa-2x" (click)="hidePet(i, pet)" aria-hidden="true"></i>
-          <h2 class="hover-on-link pet-name"
-              (click)="openShelterSite(pet.site)"> {{pet.name}} </h2>
+          <h2 class="hover-on-link pet-name" (click)="openShelterSite(pet.site)">
+            {{ pet.name }}
+          </h2>
         </div>
       </div>
       <div class="polaroid">
         <h1 class="loading-icons">
-          <i id="title-icon" class="awesome-icon fa fa-ellipsis-h" aria-hidden="true" (click)="validateZipAndCall()"></i>
+          <i
+            id="title-icon"
+            class="awesome-icon fa fa-ellipsis-h"
+            aria-hidden="true"
+            (click)="validateZipAndCall()"
+          ></i>
         </h1>
       </div>
     </div>
@@ -88,32 +97,26 @@
       <h2>
         Update the zip code within the side options to retrieve pets.
       </h2>
-      <img class="hover-on-link" (click)="openShelterSite(pet.site)"
-          src="../assets/dog-using-laptop-computer.jpg">
+      <img class="hover-on-link" (click)="openShelterSite(pet.site)" src="../assets/dog-using-laptop-computer.jpg" />
     </div>
 
-    <div *ngIf="(pets.length == 0) && (zip.length < 5) && (zip.length > 0)" class="criteria-info">
+    <div *ngIf="pets.length == 0 && zip.length < 5 && zip.length > 0" class="criteria-info">
       <h2>
         Hmm, please enter a valid 5 digit zip code.
       </h2>
-      <img class="hover-on-link" (click)="openShelterSite(pet.site)"
-          src="../assets/dog-using-laptop-computer.jpg">
+      <img class="hover-on-link" (click)="openShelterSite(pet.site)" src="../assets/dog-using-laptop-computer.jpg" />
     </div>
 
-    <div *ngIf="pets.length == 0 && zip.length==5" class="criteria-info">
+    <div *ngIf="pets.length == 0 && zip.length == 5" class="criteria-info">
       <h2>
         Searching for pets...
       </h2>
-      <h2 *ngIf="noPetsFound">
-        No pets found for zip: {{zip}}, please enter a different zip code.
-      </h2>
-      <img class="hover-on-link" (click)="openShelterSite(pet.site)"
-          src="../assets/dog-using-laptop-computer.jpg">
+      <h2 *ngIf="noPetsFound">No pets found for zip: {{ zip }}, please enter a different zip code.</h2>
+      <img class="hover-on-link" (click)="openShelterSite(pet.site)" src="../assets/dog-using-laptop-computer.jpg" />
     </div>
-
   </mat-sidenav-content>
 </mat-sidenav-container>
 
-<ng4-loading-spinner> </ng4-loading-spinner>
+<!-- <ng4-loading-spinner> </ng4-loading-spinner> -->
 
 <router-outlet></router-outlet>

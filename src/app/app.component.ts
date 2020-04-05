@@ -1,38 +1,37 @@
-import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
-import { ShelterService } from "./services/shelter.service";
-import { ChromeStorageService } from "./services/chrome-storage.service";
-import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ShelterService } from './services/shelter.service';
+import { ChromeStorageService } from './services/chrome-storage.service';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css"],
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  title = "PetWatch";
+  title = 'PetWatch';
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private shelterService: ShelterService,
-    private chromeStorageService: ChromeStorageService,
-    private spinnerService: Ng4LoadingSpinnerService
+    private chromeStorageService: ChromeStorageService // private spinnerService: Ng4LoadingSpinnerService
   ) {}
 
   pets = [];
   noPetsFound = false;
 
   selectedPetType: string;
-  zip = "";
+  zip = '';
 
   filterListTypes = [
-    { value: "all", viewValue: "All Types" },
-    { value: "dog", viewValue: "Dog" },
-    { value: "cat", viewValue: "Cat" },
+    { value: 'all', viewValue: 'All Types' },
+    { value: 'dog', viewValue: 'Dog' },
+    { value: 'cat', viewValue: 'Cat' },
     // {value: 'other', viewValue: 'Other Small Animals'},
   ];
 
   openShelterSite(site: string) {
-    window.open(site, "_blank");
+    window.open(site, '_blank');
   }
 
   ngOnInit() {
@@ -44,7 +43,7 @@ export class AppComponent implements OnInit {
   }
 
   updatePetList() {
-    this.spinnerService.show();
+    // this.spinnerService.show();
 
     this.chromeStorageService.setZip(this.zip);
     this.chromeStorageService.setFilterType(this.selectedPetType);
@@ -61,7 +60,7 @@ export class AppComponent implements OnInit {
         }
 
         this.changeDetectorRef.detectChanges();
-        this.spinnerService.hide();
+        // this.spinnerService.hide();
       },
       (error) => {
         this.noPetsFound = true;
@@ -77,12 +76,12 @@ export class AppComponent implements OnInit {
   }
 
   watchPetToggle(pet) {
-    if (pet.status === "W") {
-      pet.status = "";
+    if (pet.status === 'W') {
+      pet.status = '';
       this.chromeStorageService.removeFromWatchedList(pet.id, pet.type);
       this.chromeStorageService.setPetInfo(pet);
     } else {
-      pet.status = "W";
+      pet.status = 'W';
       this.chromeStorageService.addToWatchedList(pet.id, pet.type);
       this.chromeStorageService.setPetInfo(pet);
     }
@@ -97,5 +96,9 @@ export class AppComponent implements OnInit {
     } else {
       this.pets = [];
     }
+  }
+
+  detectChange() {
+    this.changeDetectorRef.detectChanges();
   }
 }

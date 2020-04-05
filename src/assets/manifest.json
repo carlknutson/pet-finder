@@ -3,23 +3,20 @@
   "name": "PetWatch",
   "description": "Stay up to date and track potential pets from local animal shelters.",
   "version": "1.1",
-  "icons": { "16": "assets/icon_16.png",
-             "48": "assets/icon_48.png",
-             "128": "assets/icon_128.png" },
+  "icons": {
+    "16": "assets/icon_16.png",
+    "48": "assets/icon_48.png",
+    "128": "assets/icon_128.png"
+  },
 
   "author": "Carl Knutson",
   "browser_action": {
-    "default_icon": "assets/icon_16.png",
-    "default_popup": "index.html"
+    "default_icon": "assets/icon_16.png"
   },
-  "permissions": ["activeTab", "https://www.animalhumanesociety.org/*", "storage"],
+  "permissions": ["activeTab", "storage"],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "chrome_url_overrides" : {
+  "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "web_accessible_resources": [
-    "assets/css/*",
-    "assets/js/*",
-    "assets/fonts/*"
-  ]
+  "web_accessible_resources": ["assets/css/*", "assets/js/*", "assets/fonts/*"]
 }

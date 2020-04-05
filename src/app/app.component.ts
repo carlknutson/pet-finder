@@ -1,109 +1,105 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { DOMParser } from 'dom-parser';
-import { ShelterService } from './shelter.service';
+import { ShelterService } from './services/shelter.service';
+import { ChromeStorageService } from './services/chrome-storage.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   title = 'PetWatch';
 
-  constructor(private changeDetectorRef: ChangeDetectorRef, private shelterService: ShelterService){ }
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+    private shelterService: ShelterService,
+    private chromeStorageService: ChromeStorageService,
+    private spinner: NgxSpinnerService
+  ) {}
 
   pets = [];
+  noPetsFound = false;
 
-  selectedType: string;
+  selectedPetType: string;
+  zip = '';
 
-  // filter lists
   filterListTypes = [
-    {value: '', viewValue: 'All Types'},
-    {value: 'animal_type%3ADog', viewValue: 'Dog'},
-    {value: 'animal_type%3ACat', viewValue: 'Cat'},
-    {value: 'animal_type%3ASmall%26Furry', viewValue: 'Other Small Animals'},
+    { value: 'all', viewValue: 'All Types' },
+    { value: 'dog', viewValue: 'Dog' },
+    { value: 'cat', viewValue: 'Cat' },
+    // {value: 'other', viewValue: 'Other Small Animals'},
   ];
 
-  openPetInfo(id) {
-    window.open("https://www.animalhumanesociety.org/" + id, "_blank");
-  };
+  openShelterSite(site: string) {
+    window.open(site, '_blank');
+  }
 
   ngOnInit() {
+    this.chromeStorageService.getSearchCriteria().then((value: any) => {
+      this.zip = value.zipCode;
+      this.selectedPetType = value.filterType;
+      this.validateZipAndCall();
+    });
+  }
 
-    chrome.storage.local.get(['filter_type'], result => {
-      var cachedType = result['filter_type'];
-      if (cachedType == null) {
-        console.log('filter_type is empty');
-      } else {
-        console.log('filter_type has a value of: ' + cachedType);
-        this.selectedType = cachedType;
+  updatePetList() {
+    this.spinner.show();
+
+    this.chromeStorageService.setZip(this.zip);
+    this.chromeStorageService.setFilterType(this.selectedPetType);
+
+    this.shelterService.getPets(this.zip, this.selectedPetType).then(
+      (value: object[]) => {
+        this.pets = [];
+        this.pets = this.pets.concat(value);
+
+        if (value.length === 0) {
+          this.noPetsFound = true;
+        } else {
+          this.noPetsFound = false;
+        }
+
+        this.changeDetectorRef.detectChanges();
+        this.spinner.hide();
+      },
+      (error) => {
+        this.noPetsFound = true;
       }
-      this.petFilterChange();
-    });
-  };
+    );
+  }
 
-  // new request
-  petFilterChange() {
-    var obj = {};
-    obj['filter_type'] = this.selectedType;
-
-    chrome.storage.local.set(obj, function() {
-      console.log(obj);
-    });
-
-    var link = 'https://www.animalhumanesociety.org/adoption';
-    if (this.selectedType) {
-      link = link + '?f%5B0%5D=' + this.selectedType;
-    } else {
-      console.log("not true: " + this.selectedType);
-    }
-    
-    this.shelterService.parseShelter(link).then(value => {
-      console.log(value);
-      this.pets = [];
-      this.pets = this.pets.concat(value);
-      this.changeDetectorRef.detectChanges();
-    })
-    
-  };
-
-  hidePet(index, id) {
-    var obj = {};
-    obj[id] = "D";
-
-    chrome.storage.local.set(obj, function() {
-      console.log(obj);
-    });
+  hidePet(index, pet) {
+    this.chromeStorageService.dismissPet(pet.id, pet.type);
 
     this.pets.splice(index, 1);
-
-    // needed to notify of model changes
     this.changeDetectorRef.detectChanges();
-  };
+  }
 
-  watchPetToggle(index, id, status) {
-    var cachedObj = {};
-    var newStatus = "";
-
-    if (status == "") {
-      newStatus = "W";
+  watchPetToggle(pet) {
+    if (pet.status === 'W') {
+      pet.status = '';
+      this.chromeStorageService.removeFromWatchedList(pet.id, pet.type);
+      this.chromeStorageService.setPetInfo(pet);
+    } else {
+      pet.status = 'W';
+      this.chromeStorageService.addToWatchedList(pet.id, pet.type);
+      this.chromeStorageService.setPetInfo(pet);
     }
 
-    cachedObj[id] = newStatus;
-
-    chrome.storage.local.set(cachedObj, function() {
-      console.log(cachedObj);
-    });
-
-    // update data model value for css
-    this.pets[index].status = newStatus;
-
-    // needed to notify of model changes
     this.changeDetectorRef.detectChanges();
   }
 
-  printCount() {
-    console.log("Count of the pets: " + this.pets.length);
+  validateZipAndCall() {
+    if (this.zip.length === 5) {
+      this.noPetsFound = false;
+      this.updatePetList();
+    } else {
+      this.pets = [];
+    }
   }
 
+  detectChange() {
+    this.changeDetectorRef.detectChanges();
+  }
 }

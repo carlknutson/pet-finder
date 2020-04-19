@@ -7,7 +7,7 @@ import { watch } from 'fs';
 export class ChromeStorageService {
   constructor() {}
 
-  chromeStorageSwitch = true;
+  chromeStorageSwitch = false;
 
   updateWatchHistory(petIdList, petsFromSite) {
     if (this.chromeStorageSwitch) {

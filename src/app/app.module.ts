@@ -4,9 +4,10 @@ import { NgModule } from '@angular/core';
 import { MatSidenavModule, MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { MatNativeDateModule } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -24,6 +25,8 @@ import { AppComponent } from './app.component';
     MatSelectModule,
     MatInputModule,
     NgxSpinnerModule,
+    ReactiveFormsModule,
+    MatNativeDateModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

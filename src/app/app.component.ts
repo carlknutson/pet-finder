@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ShelterService } from './services/shelter.service';
 import { ChromeStorageService } from './services/chrome-storage.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +31,16 @@ export class AppComponent implements OnInit {
     { value: 'cat', viewValue: 'Cat' },
     // {value: 'other', viewValue: 'Other Small Animals'},
   ];
+
+  filterAgeTypes = [
+    { value: 'any', viewValue: 'Any Age' },
+    { value: 'baby', viewValue: 'Baby' },
+    { value: 'young', viewValue: 'Young' },
+    { value: 'adult', viewValue: 'Adult' },
+    { value: 'senior', viewValue: 'Senior' },
+  ];
+
+  ageFormControl = new FormControl();
 
   openShelterSite(site: string) {
     window.open(site, '_blank');

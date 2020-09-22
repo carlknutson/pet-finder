@@ -18,28 +18,26 @@
       </mat-select>
     </mat-form-field>
 
+    <mat-form-field>
+      <mat-label>Age</mat-label>
+      <mat-select [formControl]="ageFormControl" multiple>
+        <mat-option *ngFor="let age of filterAgeTypes" [value]="age.value">{{ age.viewValue }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <!-- <mat-form-field>
-      <mat-label>All Sexes</mat-label>
-      <mat-select>
-        <mat-option *ngFor="let type of sexes" [value]="type.value">
-          {{type.viewValue}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-label>All Age Groups</mat-label>
-      <mat-select>
-        <mat-option *ngFor="let type of ages" [value]="type.value">
-          {{type.viewValue}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field>
       <mat-label>All Breeds</mat-label>
       <mat-select>
         <mat-option *ngFor="let type of breeds" [value]="type.value">
+          {{ type.viewValue }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>All Sexes</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let type of sexes" [value]="type.value">
           {{type.viewValue}}
         </mat-option>
       </mat-select>

@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ShelterService } from './services/shelter.service';
+import { PetfinderApiService } from './services/petfinder-api.service';
 import { ChromeStorageService } from './services/chrome-storage.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { FormControl } from '@angular/forms';
@@ -16,6 +17,7 @@ export class AppComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private shelterService: ShelterService,
     private chromeStorageService: ChromeStorageService,
+    private petfinderApiService: PetfinderApiService,
     private spinner: NgxSpinnerService
   ) {}
 
@@ -40,7 +42,10 @@ export class AppComponent implements OnInit {
     { value: 'senior', viewValue: 'Senior' },
   ];
 
+  filterBreedOptions = [];
+
   ageFormControl = new FormControl();
+  breedFormControl = new FormControl();
 
   openShelterSite(site: string) {
     window.open(site, '_blank');
@@ -51,6 +56,11 @@ export class AppComponent implements OnInit {
       this.zip = value.zipCode;
       this.selectedPetType = value.filterType;
       this.validateZipAndCall();
+    });
+
+    // populate hidden breed lists
+    this.petfinderApiService.getAllPetfinderDogBreeds().then((value: any) => {
+      this.filterBreedOptions = value;
     });
   }
 

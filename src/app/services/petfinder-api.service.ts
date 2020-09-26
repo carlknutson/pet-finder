@@ -22,14 +22,14 @@ export class PetfinderApiService {
       this.getToken().then((headerObj) => {
         this.http.get(link, headerObj).subscribe(
           (data: any) => {
-            const pets = [];
-            const petIdList = [];
+            var pets = [];
+            var petIdList = [];
 
             const apiPets = data.animals;
 
             let i = 0;
             for (i; i < apiPets.length; i++) {
-              const pet: any = {};
+              var pet: any = {};
 
               pet.name = this.cleanName(apiPets[i].name);
               pet.type = apiPets[i].type.toLowerCase();
@@ -64,6 +64,30 @@ export class PetfinderApiService {
           },
           (error) => {
             console.error('error retrieving pets in petfinder, resolving to empty list');
+            reject();
+          }
+        );
+      });
+    });
+  }
+
+  getAllPetfinderDogBreeds() {
+    const link = 'https://api.petfinder.com/v2/types/dog/breeds';
+
+    return new Promise((resolve, reject) => {
+      this.getToken().then((headerObj) => {
+        this.http.get(link, headerObj).subscribe(
+          (breedObjs: any) => {
+            console.log(breedObjs);
+            let breeds = [];
+            let i = 0;
+            for (i; i < breedObjs['breeds'].length; i++) {
+              breeds.push(breedObjs['breeds'][i]['name']);
+            }
+            resolve(breeds);
+          },
+          (error) => {
+            console.error('error retrieving breeds in petfinder');
             reject();
           }
         );

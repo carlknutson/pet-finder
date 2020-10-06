@@ -8,11 +8,11 @@ import { ChromeStorageService } from './chrome-storage.service';
 export class ShelterService {
   constructor(private petFinderApiService: PetfinderApiService, private chromeStorageService: ChromeStorageService) {}
 
-  getPets(zip: string, type: string) {
+  getPets(zip: string, type: string, age: string, breed: string) {
     const pets = [];
     return new Promise((resolve, reject) => {
       this.chromeStorageService.getWatchedPets(type).then((watchedPets: any[]) => {
-        this.petFinderApiService.getPets(zip, type, 1).then(
+        this.petFinderApiService.getPets(zip, type, age, breed, 1).then(
           (petFinderPets: any[]) => {
             resolve(watchedPets.concat(petFinderPets));
           },

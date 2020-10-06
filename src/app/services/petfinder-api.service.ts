@@ -8,28 +8,28 @@ import { PETFINDER_CLIENT_ID, PETFINDER_CLIENT_SECRET } from '../api-constants';
 export class PetfinderApiService {
   constructor(private http: HttpClient, private chromeStorageService: ChromeStorageService) {}
 
-  petTypeMapping = { dog: 'Dog', cat: 'Cat' };
+  petTypeMapping = { dog: 'Dog', cat: 'Cat', all: '' };
 
   token: string;
 
   unwatchedPets: object[] = [];
   watchedPets: object[] = [];
 
-  getPets(zip: string, type: string, page: number) {
-    const link = this.resolveShelterUrl(zip, type, page);
+  getPets(zip: string, type: string, age: string, breed: string, page: number) {
+    const link = this.resolveShelterUrl(zip, type, age, breed, page);
 
     return new Promise((resolve, reject) => {
       this.getToken().then((headerObj) => {
         this.http.get(link, headerObj).subscribe(
           (data: any) => {
-            var pets = [];
-            var petIdList = [];
+            const pets = [];
+            const petIdList = [];
 
             const apiPets = data.animals;
 
             let i = 0;
             for (i; i < apiPets.length; i++) {
-              var pet: any = {};
+              const pet: any = {};
 
               pet.name = this.cleanName(apiPets[i].name);
               pet.type = apiPets[i].type.toLowerCase();
@@ -54,7 +54,7 @@ export class PetfinderApiService {
 
               if (this.unwatchedPets.length + this.watchedPets.length < 50 && page !== totalPages) {
                 const increasePage = page + 1;
-                resolve(this.getPets(zip, type, increasePage));
+                resolve(this.getPets(zip, type, age, breed, increasePage));
               } else {
                 resolve(this.watchedPets.concat(this.unwatchedPets));
                 this.watchedPets = [];
@@ -79,10 +79,10 @@ export class PetfinderApiService {
         this.http.get(link, headerObj).subscribe(
           (breedObjs: any) => {
             console.log(breedObjs);
-            let breeds = [];
+            const breeds = [];
             let i = 0;
-            for (i; i < breedObjs['breeds'].length; i++) {
-              breeds.push(breedObjs['breeds'][i]['name']);
+            for (i; i < breedObjs.breeds.length; i++) {
+              breeds.push(breedObjs.breeds[i].name);
             }
             resolve(breeds);
           },
@@ -95,19 +95,19 @@ export class PetfinderApiService {
     });
   }
 
-  resolveShelterUrl(zip: string, type: string, page: number) {
-    if (type === 'all') {
-      return 'https://api.petfinder.com/v2/animals?location=' + zip + '&sort=distance&limit=50&page=' + page;
-    } else {
-      return (
-        'https://api.petfinder.com/v2/animals?type=' +
-        this.petTypeMapping[type] +
-        '&location=' +
-        zip +
-        '&sort=distance&limit=50&page=' +
-        page
-      );
-    }
+  resolveShelterUrl(zip: string, type: string, age: string, breed: string, page: number) {
+    return (
+      'https://api.petfinder.com/v2/animals?type=' +
+      this.petTypeMapping[type] +
+      '&location=' +
+      zip +
+      '&age=' +
+      age +
+      '&breed=' +
+      breed +
+      '&sort=distance&limit=50&page=' +
+      page
+    );
   }
 
   cleanName(name: string) {

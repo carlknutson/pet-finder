@@ -11,7 +11,7 @@
 
     <mat-form-field>
       <mat-label>Type</mat-label>
-      <mat-select (selectionChange)="validateZipAndCall()" [(ngModel)]="selectedPetType">
+      <mat-select (selectionChange)="changeTypeAndCall()" [(ngModel)]="selectedPetType">
         <mat-option *ngFor="let type of filterListTypes" [value]="type.value">
           {{ type.viewValue }}
         </mat-option>
@@ -20,14 +20,24 @@
 
     <mat-form-field>
       <mat-label>Age</mat-label>
-      <mat-select [formControl]="ageFormControl" multiple>
+      <mat-select
+        [formControl]="ageFormControl"
+        multiple
+        (selectionChange)="validateZipAndCall()"
+        [(ngModel)]="selectedAge"
+      >
         <mat-option *ngFor="let age of filterAgeTypes" [value]="age.value">{{ age.viewValue }}</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field *ngIf="selectedPetType == 'dog'">
       <mat-label>Breed</mat-label>
-      <mat-select [formControl]="breedFormControl" multiple>
+      <mat-select
+        [formControl]="breedFormControl"
+        (selectionChange)="validateZipAndCall()"
+        multiple
+        [(ngModel)]="selectedBreed"
+      >
         <mat-option *ngFor="let breed of filterBreedOptions" [value]="breed">{{ breed }}</mat-option>
       </mat-select>
     </mat-form-field>

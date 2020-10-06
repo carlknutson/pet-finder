@@ -26,6 +26,8 @@ export class AppComponent implements OnInit {
 
   selectedPetType: string;
   zip = '';
+  selectedAge = '';
+  selectedBreed = '';
 
   filterListTypes = [
     { value: 'all', viewValue: 'All Types' },
@@ -35,7 +37,6 @@ export class AppComponent implements OnInit {
   ];
 
   filterAgeTypes = [
-    { value: 'any', viewValue: 'Any Age' },
     { value: 'baby', viewValue: 'Baby' },
     { value: 'young', viewValue: 'Young' },
     { value: 'adult', viewValue: 'Adult' },
@@ -58,7 +59,7 @@ export class AppComponent implements OnInit {
       this.validateZipAndCall();
     });
 
-    // populate hidden breed lists
+    // populate hidden breed list
     this.petfinderApiService.getAllPetfinderDogBreeds().then((value: any) => {
       this.filterBreedOptions = value;
     });
@@ -70,7 +71,7 @@ export class AppComponent implements OnInit {
     this.chromeStorageService.setZip(this.zip);
     this.chromeStorageService.setFilterType(this.selectedPetType);
 
-    this.shelterService.getPets(this.zip, this.selectedPetType).then(
+    this.shelterService.getPets(this.zip, this.selectedPetType, this.selectedAge, this.selectedBreed).then(
       (value: object[]) => {
         this.pets = [];
         this.pets = this.pets.concat(value);
@@ -118,6 +119,12 @@ export class AppComponent implements OnInit {
     } else {
       this.pets = [];
     }
+  }
+
+  changeTypeAndCall() {
+    this.selectedBreed = '';
+    this.noPetsFound = false;
+    this.updatePetList();
   }
 
   detectChange() {

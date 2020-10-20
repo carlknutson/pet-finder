@@ -95,6 +95,30 @@ export class PetfinderApiService {
     });
   }
 
+  getAllPetfinderBreeds(type) {
+    const link = 'https://api.petfinder.com/v2/types/' + type + '/breeds';
+
+    return new Promise((resolve, reject) => {
+      this.getToken().then((headerObj) => {
+        this.http.get(link, headerObj).subscribe(
+          (breedObjs: any) => {
+            console.log(breedObjs);
+            const breeds = [];
+            let i = 0;
+            for (i; i < breedObjs.breeds.length; i++) {
+              breeds.push(breedObjs.breeds[i].name);
+            }
+            resolve(breeds);
+          },
+          (error) => {
+            console.error('error retrieving breeds in petfinder');
+            reject();
+          }
+        );
+      });
+    });
+  }
+
   resolveShelterUrl(zip: string, type: string, age: string, breed: string, page: number) {
     return (
       'https://api.petfinder.com/v2/animals?type=' +

@@ -43,7 +43,8 @@ export class AppComponent implements OnInit {
     { value: 'senior', viewValue: 'Senior' },
   ];
 
-  filterBreedOptions = [];
+  dogBreedOptions = [];
+  catBreedOptions = [];
 
   ageFormControl = new FormControl();
   breedFormControl = new FormControl();
@@ -60,8 +61,12 @@ export class AppComponent implements OnInit {
     });
 
     // populate hidden breed list
-    this.petfinderApiService.getAllPetfinderDogBreeds().then((value: any) => {
-      this.filterBreedOptions = value;
+    this.petfinderApiService.getAllPetfinderBreeds('dog').then((value: any) => {
+      this.dogBreedOptions = value;
+    });
+
+    this.petfinderApiService.getAllPetfinderBreeds('cat').then((value: any) => {
+      this.catBreedOptions = value;
     });
   }
 
@@ -124,7 +129,7 @@ export class AppComponent implements OnInit {
   changeTypeAndCall() {
     this.selectedBreed = '';
     this.noPetsFound = false;
-    this.updatePetList();
+    this.validateZipAndCall();
   }
 
   detectChange() {

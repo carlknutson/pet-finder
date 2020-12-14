@@ -35,6 +35,8 @@ export class ChromeStorageService {
     const obj = {
       zipCode: '',
       filterType: 'all',
+      filterAges: [],
+      filterBreeds: [],
     };
 
     if (this.chromeStorageSwitch) {
@@ -54,7 +56,25 @@ export class ChromeStorageService {
             } else {
               obj.filterType = cachedType;
             }
-            resolve(obj);
+
+            chrome.storage.local.get(['filter_ages'], (ageResults) => {
+              const storedAge: [] = ageResults.filter_ages;
+              if (storedAge == null) {
+                obj.filterAges = [];
+              } else {
+                obj.filterAges = storedAge;
+              }
+
+              chrome.storage.local.get(['filter_breeds'], (breedResults) => {
+                const storedBreed: [] = breedResults.filter_breeds;
+                if (storedBreed == null) {
+                  obj.filterBreeds = [];
+                } else {
+                  obj.filterBreeds = storedBreed;
+                }
+                resolve(obj);
+              });
+            });
           });
         });
       });
@@ -72,6 +92,28 @@ export class ChromeStorageService {
         filter_type: '',
       };
       obj.filter_type = type;
+
+      chrome.storage.local.set(obj);
+    }
+  }
+
+  setFilterAges(ages: string) {
+    if (this.chromeStorageSwitch) {
+      const obj = {
+        filter_ages: '',
+      };
+      obj.filter_ages = ages;
+
+      chrome.storage.local.set(obj);
+    }
+  }
+
+  setFilterBreeds(breeds: string) {
+    if (this.chromeStorageSwitch) {
+      const obj = {
+        filter_breeds: '',
+      };
+      obj.filter_breeds = breeds;
 
       chrome.storage.local.set(obj);
     }

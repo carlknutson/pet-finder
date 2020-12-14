@@ -26,8 +26,6 @@ export class AppComponent implements OnInit {
 
   selectedPetType: string;
   zip = '';
-  selectedAge = '';
-  selectedBreed = '';
 
   filterListTypes = [
     { value: 'all', viewValue: 'All Types' },
@@ -57,6 +55,8 @@ export class AppComponent implements OnInit {
     this.chromeStorageService.getSearchCriteria().then((value: any) => {
       this.zip = value.zipCode;
       this.selectedPetType = value.filterType;
+      this.ageFormControl.setValue(value.filterAges);
+      this.breedFormControl.setValue(value.filterBreeds);
       this.validateZipAndCall();
     });
 
@@ -75,25 +75,29 @@ export class AppComponent implements OnInit {
 
     this.chromeStorageService.setZip(this.zip);
     this.chromeStorageService.setFilterType(this.selectedPetType);
+    this.chromeStorageService.setFilterAges(this.ageFormControl.value);
+    this.chromeStorageService.setFilterBreeds(this.breedFormControl.value);
 
-    this.shelterService.getPets(this.zip, this.selectedPetType, this.selectedAge, this.selectedBreed).then(
-      (value: object[]) => {
-        this.pets = [];
-        this.pets = this.pets.concat(value);
+    this.shelterService
+      .getPets(this.zip, this.selectedPetType, this.ageFormControl.value, this.breedFormControl.value)
+      .then(
+        (value: object[]) => {
+          this.pets = [];
+          this.pets = this.pets.concat(value);
 
-        if (value.length === 0) {
+          if (value.length === 0) {
+            this.noPetsFound = true;
+          } else {
+            this.noPetsFound = false;
+          }
+
+          this.changeDetectorRef.detectChanges();
+          this.spinner.hide();
+        },
+        (error) => {
           this.noPetsFound = true;
-        } else {
-          this.noPetsFound = false;
         }
-
-        this.changeDetectorRef.detectChanges();
-        this.spinner.hide();
-      },
-      (error) => {
-        this.noPetsFound = true;
-      }
-    );
+      );
   }
 
   hidePet(index, pet) {
@@ -127,7 +131,7 @@ export class AppComponent implements OnInit {
   }
 
   changeTypeAndCall() {
-    this.selectedBreed = '';
+    this.breedFormControl.setValue('');
     this.noPetsFound = false;
     this.validateZipAndCall();
   }

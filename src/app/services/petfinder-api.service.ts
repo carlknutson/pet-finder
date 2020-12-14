@@ -78,7 +78,7 @@ export class PetfinderApiService {
       this.getToken().then((headerObj) => {
         this.http.get(link, headerObj).subscribe(
           (breedObjs: any) => {
-            console.log(breedObjs);
+            // console.log(breedObjs);
             const breeds = [];
             let i = 0;
             for (i; i < breedObjs.breeds.length; i++) {
@@ -102,7 +102,7 @@ export class PetfinderApiService {
       this.getToken().then((headerObj) => {
         this.http.get(link, headerObj).subscribe(
           (breedObjs: any) => {
-            console.log(breedObjs);
+            // console.log(breedObjs);
             const breeds = [];
             let i = 0;
             for (i; i < breedObjs.breeds.length; i++) {
